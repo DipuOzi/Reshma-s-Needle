@@ -1,0 +1,346 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Theme tokens (Tailwind v4)
+--------------------------------------------------------------------------- */
+@theme {
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-wine: #7a1f3d;
+  --color-ivory: #f8f5ef;
+  --color-sage: #a8b5a0;
+  --color-gold: #e8ce9c;
+  --color-charcoal: #292725;
+  --color-paper: #efece4;
+}
+
+/* ---------------------------------------------------------------------------
+   Palette + surface tokens
+   One consistent brand maroon, matched to the logo: #7A1F3D
+   (with a darker hover #61182F).
+--------------------------------------------------------------------------- */
+:root {
+  --font-family: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --maroon: #7a1f3d;
+  --maroon-hover: #61182f;
+  --ink: #292725;
+  --ink-muted: #6e6a64;
+  --ink-warm: #4a4641;
+  --paper: #efece4;
+  --gold: #e8ce9c;
+  --gold-deep: #c6a15b;
+  --sage: #a8b5a0;
+  --border: #e5dec9;
+  --ivory: #f8f5ef;
+  --error: #9e3b3b;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    font-family: var(--font-family);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    vertical-align: baseline;
+    text-size-adjust: 100%;
+  }
+
+  html {
+    color: var(--ink);
+    scroll-behavior: smooth;
+    scrollbar-color: var(--maroon) var(--ivory);
+  }
+
+  body {
+    color: var(--ink);
+    background-color: var(--ivory);
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--maroon);
+    color: var(--ivory);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--ivory);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--maroon);
+    border: 2px solid var(--ivory);
+    border-radius: 9999px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Rich surfaces — flat colours so the wine reads the same everywhere.
+--------------------------------------------------------------------------- */
+.bg-wine-rich {
+  background-color: var(--maroon);
+}
+
+.bg-charcoal-rich {
+  background-color: var(--ink);
+  background-image:
+    radial-gradient(
+      900px 460px at 12% -10%,
+      rgba(210, 178, 128, 0.1),
+      transparent 55%
+    ),
+    radial-gradient(
+      760px 420px at 100% 115%,
+      rgba(122, 31, 61, 0.4),
+      transparent 60%
+    ),
+    linear-gradient(170deg, #1f1e1d 0%, #292725 55%, #2e2b29 100%);
+}
+
+.bg-ivory-rich {
+  background-color: var(--ivory);
+  background-image:
+    radial-gradient(
+      1000px 500px at 100% 0%,
+      rgba(168, 181, 160, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(
+      800px 400px at 0% 100%,
+      rgba(122, 31, 61, 0.05),
+      transparent 55%
+    );
+}
+
+.bg-sage-rich {
+  background-color: var(--sage);
+  background-image:
+    radial-gradient(
+      900px 480px at 90% 10%,
+      rgba(248, 245, 239, 0.22),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px 400px at 0% 100%,
+      rgba(122, 31, 61, 0.1),
+      transparent 55%
+    );
+}
+
+/* ---------------------------------------------------------------------------
+   Gold hairline used to separate premium sections
+--------------------------------------------------------------------------- */
+.gold-hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(198, 161, 91, 0.65) 30%,
+    rgba(232, 206, 156, 0.9) 50%,
+    rgba(198, 161, 91, 0.65) 70%,
+    transparent 100%
+  );
+}
+
+/* Champagne-gold serif text for small accents ("est.", quote marks, ornaments) */
+.text-gold-grad {
+  background: linear-gradient(120deg, #a8813c 0%, #e8ce9c 45%, #a8813c 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Light sweep across premium buttons on hover
+--------------------------------------------------------------------------- */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.btn-sheen:hover::after {
+  transform: translateX(130%);
+}
+
+/* ---------------------------------------------------------------------------
+   Animations
+--------------------------------------------------------------------------- */
+@keyframes rn-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: rn-fade-in 0.45s ease-out both;
+}
+
+@keyframes rn-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rn-float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes rn-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes rn-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rn-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.deco-float {
+  animation: rn-float 9s ease-in-out infinite;
+}
+
+.deco-float-slow {
+  animation: rn-float-slow 14s ease-in-out infinite;
+}
+
+.deco-sway {
+  animation: rn-sway 8s ease-in-out infinite;
+}
+
+.deco-spin {
+  animation: rn-spin 40s linear infinite;
+}
+
+.deco-pulse {
+  animation: rn-pulse 6s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .btn-sheen::after {
+    display: none;
+  }
+
+  .animate-fade-in,
+  .deco-float,
+  .deco-float-slow,
+  .deco-sway,
+  .deco-spin,
+  .deco-pulse {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile form controls
+   iOS Safari zooms the page when a focused input is smaller than 16px; keep
+   controls at 16px on phones so the viewport never jumps. This sits outside
+   a cascade layer, so it wins over the smaller utility classes by design.
+--------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Pointer cursor for interactive elements (Tailwind v4 defaults buttons to
+   the regular arrow).
+--------------------------------------------------------------------------- */
+@layer base {
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select:not(:disabled),
+  label[for],
+  label:has(> input[type="checkbox"]),
+  label:has(> input[type="radio"]),
+  label:has(> input[type="file"]),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
