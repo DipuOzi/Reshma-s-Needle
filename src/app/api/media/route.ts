@@ -3,6 +3,8 @@ import { db } from "@/db";
 import { mediaAssets } from "@/db/schema";
 import { ensureSeeded } from "@/db/seed";
 import { requireAdmin } from "@/lib/adminAuth";
+import { isGithubConfigured, commitFiles, GitHubError } from "@/lib/github";
+import { slugify } from "@/lib/contentStore";
 
 export const dynamic = "force-dynamic";
 
@@ -16,12 +18,19 @@ const ALLOWED_TYPES = new Set([
   "image/avif",
 ]);
 
+const EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+};
+
 export async function POST(request: NextRequest) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   try {
-    await ensureSeeded();
     const formData = await request.formData();
     const file = formData.get("file");
 
@@ -45,6 +54,40 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    /**
+     * GitHub mode (always true in production): the upload is committed
+     * straight to public/images/uploads/ so it ships with the next
+     * deployment and can never disappear from a rebuilt one.
+     */
+    if (isGithubConfigured()) {
+      const ext = EXTENSIONS[file.type] ?? "jpg";
+      const base = slugify(file.name.replace(/\.[^.]+$/, "")) || "upload";
+      const filename = `u-${Date.now().toString(36)}-${base}.${ext}`;
+      const repoPath = `public/images/uploads/${filename}`;
+      try {
+        await commitFiles(
+          `Upload image ${filename} via admin dashboard`,
+          [{ path: repoPath, base64: buffer.toString("base64") }]
+        );
+        return NextResponse.json(
+          { url: `/images/uploads/${filename}`, id: null },
+          { status: 201 }
+        );
+      } catch (error) {
+        console.error("[media] GitHub upload failed:", error);
+        const message =
+          error instanceof GitHubError
+            ? `GitHub upload failed: ${error.message}`
+            : "Image upload failed. Please try again.";
+        return NextResponse.json({ error: message }, { status: 502 });
+      }
+    }
+
+    /**
+     * Local fallback (no GitHub token): mirror the legacy database upload.
+     */
+    await ensureSeeded();
     const [asset] = await db
       .insert(mediaAssets)
       .values({

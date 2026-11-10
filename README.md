@@ -47,6 +47,39 @@ npm run dev          # http://localhost:3000
 
 To run on another port: `npm run dev -- -p 3001`.
 
+## Publishing website content to GitHub (production)
+
+The Admin Dashboard **Save & Publish** button commits the website content to
+this GitHub repository, which triggers a fresh Vercel deployment:
+
+| Repo file | Contents |
+| --- | --- |
+| `content/products.json` | Published product catalogue |
+| `content/site-content.json` | Edits from *Page Content & Images* |
+| `content/settings.json` | WhatsApp, delivery, bKash/Nagad settings |
+| `content/…` image uploads | `public/images/uploads/…` (committed at upload time) |
+| `data/orders.json` | Customer orders (and status changes) |
+| `data/customers.json` | Customer accounts (passwords are salted scrypt hashes) |
+| `data/tailoring-requests.json` | Bespoke tailoring requests |
+
+Required environment variables (Vercel → Project Settings → Environment Variables):
+
+| Variable | Meaning |
+| --- | --- |
+| `GITHUB_TOKEN` | Fine-grained personal access token with **Contents: Read and write** on this repo only |
+| `GITHUB_OWNER` | e.g. `DipuOzi` |
+| `GITHUB_REPO` | e.g. `Reshma-s-Needle` |
+| `GITHUB_BRANCH` | Default `main` |
+
+Also set `ADMIN_ACCESS_CODE` and `ADMIN_SESSION_SECRET` in production — the
+fallback `SAD1999` code is public knowledge from the README.
+
+Workflow: edits are stored as a draft in your browser → "Save & Publish"
+commits only the changed files → Vercel auto-deploys → the storefront serves
+the commit. Nothing changes on the live site until a publish succeeds, and a
+failed publish keeps your draft so it can be retried. Commits are skipped
+when the content is already identical (no wasted deployments).
+
 ## Database
 
 The site works with **no database setup**. On start it picks one automatically:
@@ -81,8 +114,8 @@ After 5 wrong attempts access is paused for 15 minutes. Tabs:
 4. **Page Content & Images** — edit the text and pictures of Home, Shop, Customize, About, Contact and Footer.
 5. **WhatsApp, Delivery & Payment** — WhatsApp number, delivery charges, bKash / Nagad instructions, social links.
 
-Photos uploaded in the dashboard are stored in the database (so they travel with
-`.data` / your PostgreSQL). Built-in pictures live in `public/images/`.
+Photos uploaded in the dashboard are committed to the repository
+(`public/images/uploads/`). Built-in pictures live in `public/images/`.
 
 Demo customer account: `samira@example.com` / `reshma2026`.
 

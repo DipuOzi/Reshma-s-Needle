@@ -115,7 +115,7 @@ const TAILORING_STATUSES = [
 ];
 
 export function AdminDashboard() {
-  const { settings, refreshSettings, refreshContent, showToast } = useStore();
+  const { settings, refreshSettings, setContent, showToast } = useStore();
 
   const [activeTab, setActiveTab] = useState<
     "products" | "tailoring" | "orders" | "content" | "settings"
@@ -431,12 +431,23 @@ export function AdminDashboard() {
         return;
       }
       clearAdminDraft();
-      await Promise.all([
-        refreshSettings(),
-        refreshContent(),
-        loadAllAdminData(),
-      ]);
-      showToast("Published — your changes are now live on the website");
+      if (data.published?.products) {
+        setProducts(data.published.products);
+        setDeletedProductIds([]);
+      }
+      if (data.published?.content) {
+        setContent(data.published.content);
+      }
+      if (data.published?.settings) {
+        setSettingsForm(data.published.settings);
+        await refreshSettings();
+      }
+      await loadAllAdminData();
+      showToast(
+        data.commitSha
+          ? "Published to GitHub — a new Vercel deployment has started"
+          : "Published — your changes are now live on the website"
+      );
     } catch {
       showToast("Publishing failed. Please try again.");
     } finally {

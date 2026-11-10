@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "orderNumber": "RN-2026-1041",
+    "customerId": 1,
+    "customerName": "Samira Chowdhury",
+    "customerEmail": "samira@example.com",
+    "phone": "01712345678",
+    "whatsapp": "8801712345678",
+    "deliveryAddress": "Apartment 4B, House 22, Road 11, Banani, Dhaka 1213",
+    "deliveryZone": "Inside Dhaka",
+    "orderNotes": "Please package in a gift box with a handwritten note.",
+    "paymentMethod": "bKash",
+    "paymentTransactionId": "BK9482716XM",
+    "items": [
+      {
+        "productId": 1,
+        "slug": "mehrun-chanderi-silk-three-piece",
+        "name": "Mehrun Handloom Chanderi Three Piece",
+        "category": "Three Piece",
+        "image": "/images/product-velvet-wine.jpg",
+        "unitPrice": 9250,
+        "quantity": 1,
+        "purchaseMode": "Custom Stitched",
+        "selectedColor": "Deep Wine",
+        "selectedSize": "Custom Stitched",
+        "measurementUnit": "inches",
+        "customMeasurements": {
+          "shoulder": "14.5",
+          "bust": "36",
+          "waist": "30",
+          "hip": "39",
+          "kameezLength": "44",
+          "trouserLength": "38"
+        }
+      }
+    ],
+    "subtotal": 9250,
+    "deliveryCharge": 80,
+    "total": 9330,
+    "status": "In Tailoring",
+    "createdAt": "2026-01-05T10:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "orderNumber": "RN-2026-1042",
+    "customerId": null,
+    "customerName": "Farhana Rahman",
+    "customerEmail": "farhana.r@example.com",
+    "phone": "01819223344",
+    "whatsapp": "8801819223344",
+    "deliveryAddress": "House 9, Road 4, Dhanmondi, Dhaka 1205",
+    "deliveryZone": "Inside Dhaka",
+    "orderNotes": "Deliver in the afternoon after 2 PM.",
+    "paymentMethod": "Cash on Delivery",
+    "paymentTransactionId": null,
+    "items": [
+      {
+        "productId": 4,
+        "slug": "aria-raw-silk-tailored-two-piece",
+        "name": "Aria Ivory Raw Silk Tailored Two Piece",
+        "category": "Two Piece",
+        "image": "/images/collection-two-piece.jpg",
+        "unitPrice": 5950,
+        "quantity": 1,
+        "purchaseMode": "Ready-to-Wear",
+        "selectedColor": "Warm Ivory / Wine Piping",
+        "selectedSize": "M"
+      }
+    ],
+    "subtotal": 5950,
+    "deliveryCharge": 80,
+    "total": 6030,
+    "status": "Confirmed",
+    "createdAt": "2026-01-06T14:30:00.000Z"
+  }
+]

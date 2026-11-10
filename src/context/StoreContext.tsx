@@ -28,6 +28,8 @@ export interface ProductRecord {
   featured: boolean;
   supportsUnstitched: boolean;
   supportsCustomTailoring: boolean;
+  /** ISO timestamp; present on published/persisted records. */
+  createdAt?: string;
 }
 
 export interface StoreSettingsRecord {
