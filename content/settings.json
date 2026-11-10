@@ -1,0 +1,17 @@
+{
+  "id": 1,
+  "brandName": "Reshma's Needle",
+  "heroHeadline": "Elegance, Made Personal.",
+  "heroSubtext": "Thoughtfully designed clothing, tailored to feel uniquely yours.",
+  "whatsappNumber": "8801711987654",
+  "contactEmail": "atelier@reshmasneedle.com",
+  "atelierAddress": "House 14, Road 7, Gulshan-1, Dhaka 1212",
+  "deliveryChargeInside": 80,
+  "deliveryChargeOutside": 150,
+  "bkashNumber": "01711-987654 (Merchant)",
+  "bkashInstructions": "Open your bKash app, choose 'Make Payment' to 01711-987654, enter your order total, and provide the Transaction ID (TrxID) below or share via WhatsApp.",
+  "nagadNumber": "01819-987654 (Merchant)",
+  "nagadInstructions": "Open your Nagad app, select 'Merchant Pay' to 01819-987654, enter your order total, and provide your Transaction ID below or share via WhatsApp.",
+  "instagramUrl": "https://instagram.com/reshmasneedle",
+  "facebookUrl": "https://facebook.com/reshmasneedle"
+}

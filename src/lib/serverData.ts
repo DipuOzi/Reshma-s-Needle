@@ -2,9 +2,23 @@ import { db } from "@/db";
 import { siteContent, storeSettings } from "@/db/schema";
 import { ensureSeeded } from "@/db/seed";
 import { DEFAULT_CONTENT, mergeContent, type SiteContent } from "./siteContent";
+import { readPublishedJson } from "./contentStore";
 import type { StoreSettingsRecord } from "@/context/StoreContext";
 
+/**
+ * Site copy for page rendering. The published repo file
+ * (content/site-content.json — updated by "Save & Publish") comes first;
+ * the legacy database is only consulted when that file has never been
+ * published yet (older local clones without the files).
+ */
 export async function getSiteContent(): Promise<SiteContent> {
+  const published = await readPublishedJson<Record<string, Record<string, unknown>>>(
+    "content/site-content.json"
+  );
+  if (published.data) {
+    return mergeContent(published.data);
+  }
+
   try {
     await ensureSeeded();
     const rows = await db.select().from(siteContent);
@@ -18,6 +32,13 @@ export async function getSiteContent(): Promise<SiteContent> {
 }
 
 export async function getStoreSettings(): Promise<StoreSettingsRecord | null> {
+  const published = await readPublishedJson<StoreSettingsRecord>(
+    "content/settings.json"
+  );
+  if (published.data && typeof published.data.brandName === "string") {
+    return { ...published.data, id: published.data.id ?? 1 };
+  }
+
   try {
     await ensureSeeded();
     const [row] = await db.select().from(storeSettings);

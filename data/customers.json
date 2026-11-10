@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "Samira Chowdhury",
+    "email": "samira@example.com",
+    "phone": "01712345678",
+    "whatsapp": "8801712345678",
+    "address": "Apartment 4B, House 22, Road 11, Banani, Dhaka 1213",
+    "passwordHash": "scrypt:a543c9b8dd5de5087a62c1205ee43178:7a1448799c2a84bd19932910c4bac070e05f9ce69bd5a7e6d936eea38585e31474e95b1cdd26f40e95babecc5c831b781631be8a0ccad5b11db3f4b83bd90971",
+    "measurementUnit": "inches",
+    "savedMeasurements": {
+      "shoulder": "14.5",
+      "bust": "36",
+      "waist": "30",
+      "hip": "39",
+      "sleeveLength": "21",
+      "armhole": "16.5",
+      "upperArm": "12",
+      "kameezLength": "44",
+      "trouserLength": "38",
+      "trouserWaist": "31",
+      "trouserHip": "40",
+      "neckStyle": "Sweetheart Front with Keyhole Back"
+    },
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+]

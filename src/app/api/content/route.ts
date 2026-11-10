@@ -4,8 +4,12 @@ import { siteContent } from "@/db/schema";
 import { requireAdmin } from "@/lib/adminAuth";
 import { getSiteContent } from "@/lib/serverData";
 import { DEFAULT_CONTENT, isContentPageKey } from "@/lib/siteContent";
+import { readLiveJson, commitJsonFile } from "@/lib/contentStore";
+import { isGithubConfigured } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
+
+const CONTENT_FILE = "content/site-content.json";
 
 const MAX_FIELD_LENGTH = 5000;
 
@@ -39,6 +43,17 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    if (isGithubConfigured()) {
+      const current =
+        (await readLiveJson<Record<string, Record<string, string>>>(CONTENT_FILE))
+          .data ?? {};
+      const next = { ...current, [page]: { ...(current[page] ?? {}), ...clean } };
+      await commitJsonFile(CONTENT_FILE, next, `Update ${page} page content`);
+      const content = await getSiteContent();
+      return NextResponse.json({ content });
+    }
+
+    // Legacy local-database fallback.
     await db
       .insert(siteContent)
       .values({ key: page, value: clean, updatedAt: new Date() })
