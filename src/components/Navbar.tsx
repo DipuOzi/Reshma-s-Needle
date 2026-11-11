@@ -208,7 +208,7 @@ export function Navbar() {
             {/* Sliding pill background (no capsule behind the whole menu) */}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 h-10 -translate-y-1/2 rounded-full bg-[#292725] shadow-[0_4px_14px_rgba(41,39,37,0.25)] transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="pointer-events-none absolute top-1/2 h-10 -translate-y-1/2 rounded-full bg-[#8FBC98] shadow-[0_4px_14px_rgba(74,107,83,0.3)] transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{ left: pill.left, width: pill.width, opacity: pill.opacity }}
             />
             {MAIN_LINKS.map((link, index) => {
