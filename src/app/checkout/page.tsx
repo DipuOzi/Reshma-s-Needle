@@ -194,9 +194,9 @@ export default function CheckoutPage() {
               animation="sway"
             />
             <div className="flex items-start gap-4 border-b border-[#E5DEC9] pb-6">
-              <CheckCircle2 className="w-8 h-8 text-[#7CA982] shrink-0 mt-1" />
+              <CheckCircle2 className="w-8 h-8 text-[#4A6B53] shrink-0 mt-1" />
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#7CA982] font-medium">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#4A6B53] font-medium">
                   Order Confirmed &middot; {confirmedOrder.orderNumber}
                 </p>
                 <h1 className="font-serif text-3xl sm:text-4xl text-[#292725] mt-1">
@@ -333,8 +333,8 @@ export default function CheckoutPage() {
         )}
 
         {whatsappOrderUrl && (
-          <div className="mb-8 p-4 bg-[#7CA982]/10 border border-[#7CA982] flex items-start gap-3 text-sm">
-            <MessageCircle className="w-5 h-5 shrink-0 text-[#7CA982] mt-0.5" />
+          <div className="mb-8 p-4 bg-[#7CA982]/10 border border-[#4A6B53] flex items-start gap-3 text-sm">
+            <MessageCircle className="w-5 h-5 shrink-0 text-[#4A6B53] mt-0.5" />
             <div>
               <p className="font-medium text-[#292725]">
                 WhatsApp is open with your order details
@@ -347,7 +347,7 @@ export default function CheckoutPage() {
                   href={whatsappOrderUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline text-[#7CA982] hover:text-[#292725]"
+                  className="underline text-[#4A6B53] hover:text-[#292725]"
                 >
                   tap here to open it again
                 </a>
@@ -518,7 +518,7 @@ export default function CheckoutPage() {
                   onClick={() => setOrderChannel("whatsapp")}
                   className={`p-4 border text-left transition-all ${
                     orderChannel === "whatsapp"
-                      ? "border-[#7CA982] bg-[#7CA982] text-[#F8F5EF]"
+                      ? "border-[#4A6B53] bg-[#4A6B53] text-[#F8F5EF]"
                       : "border-[#E5DEC9] bg-[#F8F5EF] text-[#292725] hover:border-[#292725]"
                   }`}
                 >
@@ -538,7 +538,7 @@ export default function CheckoutPage() {
               </div>
 
               {orderChannel === "whatsapp" && (
-                <div className="p-4 bg-[#7CA982]/5 border border-[#7CA982]/40 text-xs text-[#6E6A64] leading-relaxed">
+                <div className="p-4 bg-[#7CA982]/5 border border-[#4A6B53]/40 text-xs text-[#6E6A64] leading-relaxed">
                   Your bag, delivery details, and total will be pre-filled in a
                   WhatsApp message to{" "}
                   <strong className="text-[#292725]">
@@ -740,7 +740,7 @@ export default function CheckoutPage() {
               disabled={submitting || cart.length === 0}
               className={`w-full py-4 px-6 btn-sheen disabled:opacity-50 text-[#F8F5EF] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2 cursor-pointer ${
                 orderChannel === "whatsapp"
-                  ? "bg-[#7CA982] hover:bg-[#7CA982]/85"
+                  ? "bg-[#4A6B53] hover:bg-[#3A5544]"
                   : "bg-[#7A1F3D] hover:bg-[#61182F]"
               }`}
             >

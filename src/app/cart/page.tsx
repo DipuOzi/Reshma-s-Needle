@@ -298,7 +298,7 @@ export default function CartPage() {
                   href={`https://wa.me/${cleanOwnerWa}?text=${waCartMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-4 px-6 border border-[#7CA982] text-[#7CA982] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2 hover:bg-[#7CA982] hover:text-[#F8F5EF]"
+                  className="w-full py-4 px-6 border border-[#4A6B53] text-[#4A6B53] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2 hover:bg-[#4A6B53] hover:text-[#F8F5EF]"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>WhatsApp</span>

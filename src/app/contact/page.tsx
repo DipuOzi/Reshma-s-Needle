@@ -90,7 +90,7 @@ export default function ContactPage() {
               {/* Atelier charm in the card corner */}
               <Motif
                 kind="button"
-                className="absolute right-5 top-5 w-10 text-[#7CA982]/50"
+                className="absolute right-5 top-5 w-10 text-[#4A6B53]/50"
                 animation="spin"
               />
               <div className="flex items-start gap-3.5">
@@ -156,7 +156,7 @@ export default function ContactPage() {
           <div className="relative lg:col-span-7 bg-white border border-[#E5DEC9] border-t-[3px] border-t-[#7A1F3D] p-7 sm:p-10 shadow-[0_22px_50px_rgba(122,31,61,0.10)]">
             {sent ? (
               <div className="py-10 text-center space-y-4">
-                <CheckCircle2 className="w-10 h-10 text-[#7CA982] mx-auto" />
+                <CheckCircle2 className="w-10 h-10 text-[#4A6B53] mx-auto" />
                 <h2 className="font-serif text-3xl text-[#292725]">
                   Thank You, {name}
                 </h2>

@@ -161,7 +161,7 @@ export function Navbar() {
 
         {toastMessage && (
           <div className="fixed bottom-24 left-4 right-4 z-50 flex max-w-[calc(100vw_-_2rem)] items-center gap-3 border border-[#7A1F3D]/40 bg-[#292725] px-5 py-3.5 text-[#F8F5EF] shadow-xl animate-fade-in sm:left-auto sm:right-6">
-            <span className="w-2 h-2 rounded-full bg-[#7CA982]" />
+            <span className="w-2 h-2 rounded-full bg-[#4A6B53]" />
             <span className="text-xs tracking-[0.06em]">{toastMessage}</span>
           </div>
         )}
@@ -287,7 +287,7 @@ export function Navbar() {
       {/* Subtle Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-24 left-4 right-4 z-50 flex max-w-[calc(100vw_-_2rem)] items-center gap-3 border border-[#7A1F3D]/40 bg-[#292725] px-5 py-3.5 text-[#F8F5EF] shadow-xl animate-fade-in sm:left-auto sm:right-6">
-          <span className="w-2 h-2 rounded-full bg-[#7CA982]" />
+          <span className="w-2 h-2 rounded-full bg-[#4A6B53]" />
           <span className="text-xs tracking-[0.06em]">{toastMessage}</span>
         </div>
       )}

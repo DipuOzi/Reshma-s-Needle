@@ -279,7 +279,7 @@ export function TailoringMannequin({
                     isSelected
                       ? "h-6 w-6 border-2 border-[#F8F5EF] bg-[#7A1F3D] text-[10px] text-white"
                       : isFilled
-                        ? "h-[18px] w-[18px] border-[#F8F5EF] bg-[#7CA982] text-[8px] text-white"
+                        ? "h-[18px] w-[18px] border-[#F8F5EF] bg-[#4A6B53] text-[8px] text-white"
                         : "h-[18px] w-[18px] border-[#7A1F3D]/70 bg-[#F8F5EF] text-[8px] text-[#7A1F3D]"
                   }`}
                 >
@@ -324,7 +324,7 @@ export function TailoringMannequin({
             {relevantSpecs.length.toString().padStart(2, "0")}
           </span>
           {values[currentSpec.key] && (
-            <span className="font-mono text-[11px] text-[#7CA982]">
+            <span className="font-mono text-[11px] text-[#4A6B53]">
               {values[currentSpec.key]} {unit === "inches" ? "in" : "cm"}
             </span>
           )}
