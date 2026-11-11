@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
 import { AtelierBackdrop, Motif, StitchRule } from "./AtelierDecor";
@@ -66,6 +67,10 @@ export function Footer() {
   const [legalModal, setLegalModal] = useState<"privacy" | "terms" | null>(
     null
   );
+  const pathname = usePathname();
+
+  // The admin dashboard is a standalone tool — no storefront footer there.
+  if (pathname.startsWith("/admin")) return null;
 
   const cleanWhatsapp = settings.whatsappNumber.replace(/[^0-9]/g, "");
 
@@ -101,7 +106,7 @@ export function Footer() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
             {/* Brand — identical presentation to the header */}
             <div className="space-y-6 lg:col-span-5">
-              <BrandLogo size="lg" href="/" />
+              <BrandLogo size="2xl" href="/" />
               <p className="max-w-sm text-sm font-light leading-relaxed text-[#6E6A64]">
                 {content.footer.about}
               </p>
