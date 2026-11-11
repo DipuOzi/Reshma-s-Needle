@@ -190,7 +190,7 @@ export function Navbar() {
             >
               <Menu className="w-5 h-5 stroke-[1.5]" />
             </button>
-            <div className="max-[359px]:[&_img]:h-16 translate-y-[6px]">
+            <div className="max-[359px]:[&_img]:h-16">
               <BrandLogo size="md" />
             </div>
           </div>
