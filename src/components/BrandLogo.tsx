@@ -32,15 +32,18 @@ export function BrandLogo({
   const content = (
     <div className="inline-flex items-center select-none">
       {/* Official logo artwork (public/logo.svg) — the full brand lockup.
-          On dark backgrounds it sits on a small ivory charm plate with a
-          champagne-gold ring so the dark charcoal artwork always reads well. */}
-      <span
-        className={`flex shrink-0 items-center justify-center ${
-          isLight
-            ? "rounded-full bg-[#F8F5EF] p-[3px] ring-1 ring-[#C6A15B]/40"
-            : ""
-        }`}
-      >
+          On dark backgrounds the ivory-text variant (public/logo-light.svg)
+          is used directly, so the wordmark reads on charcoal with no plate. */}
+      {isLight ? (
+        <img
+          src="/logo-light.svg"
+          alt="Reshma's Needle — Atelier & Bespoke Tailoring"
+          width={Math.round(px * 1.2)}
+          height={px}
+          className={imgClasses}
+          draggable={false}
+        />
+      ) : (
         <img
           src="/logo.svg"
           alt="Reshma's Needle — Atelier & Bespoke Tailoring"
@@ -49,7 +52,7 @@ export function BrandLogo({
           className={imgClasses}
           draggable={false}
         />
-      </span>
+      )}
     </div>
   );
 

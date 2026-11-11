@@ -86,11 +86,11 @@ export default function ContactPage() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="relative bg-white border border-[#E5DEC9] border-t-[3px] border-t-[#A8B5A0] p-7 space-y-6 shadow-[0_18px_40px_rgba(41,39,37,0.08)]">
+            <div className="relative bg-white border border-[#E5DEC9] border-t-[3px] border-t-[#7CA982] p-7 space-y-6 shadow-[0_18px_40px_rgba(41,39,37,0.08)]">
               {/* Atelier charm in the card corner */}
               <Motif
                 kind="button"
-                className="absolute right-5 top-5 w-10 text-[#A8B5A0]/50"
+                className="absolute right-5 top-5 w-10 text-[#7CA982]/50"
                 animation="spin"
               />
               <div className="flex items-start gap-3.5">

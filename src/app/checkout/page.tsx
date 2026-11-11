@@ -47,6 +47,10 @@ export default function CheckoutPage() {
     "Cash on Delivery" | "bKash" | "Nagad"
   >("Cash on Delivery");
   const [paymentTransactionId, setPaymentTransactionId] = useState("");
+  const [orderChannel, setOrderChannel] = useState<"online" | "whatsapp">(
+    "online"
+  );
+  const [whatsappOrderUrl, setWhatsappOrderUrl] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +74,37 @@ export default function CheckoutPage() {
 
   const total = subtotal + deliveryCharge;
 
+  const buildWhatsAppOrderMessage = () => {
+    const lines = [
+      "Hello Reshma's Needle! I would like to place an order via WhatsApp.",
+      "",
+      "Order Items",
+      ...cart.map(
+        (item, i) =>
+          `${i + 1}. ${item.name} × ${item.quantity} — ${item.purchaseMode} · ${
+            item.selectedColor
+          } · ${item.selectedSize} — ${formatPrice(
+            item.unitPrice * item.quantity
+          )}`
+      ),
+      "",
+      `Subtotal: ${formatPrice(subtotal)}`,
+      `Delivery (${deliveryZone}): ${formatPrice(deliveryCharge)}`,
+      `Order Total: ${formatPrice(total)}`,
+      "",
+      "Delivery Details",
+      `Name: ${customerName}`,
+      `Phone: ${phone}`,
+      `WhatsApp: ${whatsapp}`,
+      customerEmail ? `Email: ${customerEmail}` : "",
+      `Address: ${deliveryAddress}`,
+      orderNotes ? `Notes: ${orderNotes}` : "",
+      "",
+      `Payment Preference: ${paymentMethod} (to confirm in this chat)`,
+    ];
+    return lines.filter(Boolean).join("\n");
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -88,6 +123,18 @@ export default function CheckoutPage() {
 
     if (cart.length === 0) {
       setError("Your shopping bag is empty.");
+      return;
+    }
+
+    if (orderChannel === "whatsapp") {
+      const cleanOwnerWa = settings.whatsappNumber.replace(/[^0-9]/g, "");
+      const url = `https://wa.me/${cleanOwnerWa}?text=${encodeURIComponent(
+        buildWhatsAppOrderMessage()
+      )}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+      setWhatsappOrderUrl(url);
+      setError(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -285,6 +332,31 @@ export default function CheckoutPage() {
           </div>
         )}
 
+        {whatsappOrderUrl && (
+          <div className="mb-8 p-4 bg-[#4A6B53]/10 border border-[#4A6B53] flex items-start gap-3 text-sm">
+            <MessageCircle className="w-5 h-5 shrink-0 text-[#4A6B53] mt-0.5" />
+            <div>
+              <p className="font-medium text-[#292725]">
+                WhatsApp is open with your order details
+              </p>
+              <p className="text-[#6E6A64] mt-1 leading-relaxed">
+                Press <strong className="text-[#292725]">Send</strong> in
+                WhatsApp to place your order — we will confirm payment and
+                delivery with you in the chat. If the chat did not open,{" "}
+                <a
+                  href={whatsappOrderUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-[#4A6B53] hover:text-[#292725]"
+                >
+                  tap here to open it again
+                </a>
+                . Your bag stays intact until the order is confirmed.
+              </p>
+            </div>
+          </div>
+        )}
+
         <form
           onSubmit={handlePlaceOrder}
           className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
@@ -411,11 +483,72 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Payment Method Section */}
+            {/* Order Channel & Payment Method Section */}
             <div className="bg-white border border-[#E5DEC9] p-6 sm:p-8 space-y-5">
               <h2 className="font-serif text-2xl text-[#292725] border-b border-[#E5DEC9] pb-3">
-                2. Payment Method
+                2. Order &amp; Payment Method
               </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOrderChannel("online")}
+                  className={`p-4 border text-left transition-all ${
+                    orderChannel === "online"
+                      ? "border-[#7A1F3D] bg-[#7A1F3D] text-[#F8F5EF]"
+                      : "border-[#E5DEC9] bg-[#F8F5EF] text-[#292725] hover:border-[#292725]"
+                  }`}
+                >
+                  <p className="text-xs uppercase tracking-[0.16em] font-medium">
+                    Place Order Online
+                  </p>
+                  <p
+                    className={`text-[11px] mt-1 ${
+                      orderChannel === "online"
+                        ? "text-[#F8F5EF]/80"
+                        : "text-[#6E6A64]"
+                    }`}
+                  >
+                    Complete checkout on the website &amp; track it in your
+                    account
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderChannel("whatsapp")}
+                  className={`p-4 border text-left transition-all ${
+                    orderChannel === "whatsapp"
+                      ? "border-[#4A6B53] bg-[#4A6B53] text-[#F8F5EF]"
+                      : "border-[#E5DEC9] bg-[#F8F5EF] text-[#292725] hover:border-[#292725]"
+                  }`}
+                >
+                  <p className="text-xs uppercase tracking-[0.16em] font-medium">
+                    Order via WhatsApp
+                  </p>
+                  <p
+                    className={`text-[11px] mt-1 ${
+                      orderChannel === "whatsapp"
+                        ? "text-[#F8F5EF]/80"
+                        : "text-[#6E6A64]"
+                    }`}
+                  >
+                    Send your order directly to our WhatsApp chat
+                  </p>
+                </button>
+              </div>
+
+              {orderChannel === "whatsapp" && (
+                <div className="p-4 bg-[#4A6B53]/5 border border-[#4A6B53]/40 text-xs text-[#6E6A64] leading-relaxed">
+                  Your bag, delivery details, and total will be pre-filled in a
+                  WhatsApp message to{" "}
+                  <strong className="text-[#292725]">
+                    {settings.whatsappNumber}
+                  </strong>
+                  . Simply press <strong className="text-[#292725]">Send</strong>{" "}
+                  in WhatsApp to place the order, then confirm payment &amp;
+                  delivery in the chat.
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {(["Cash on Delivery", "bKash", "Nagad"] as const).map(
@@ -423,7 +556,10 @@ export default function CheckoutPage() {
                     <button
                       key={method}
                       type="button"
-                      onClick={() => setPaymentMethod(method)}
+                      onClick={() => {
+                        if (method !== paymentMethod) setPaymentTransactionId("");
+                        setPaymentMethod(method);
+                      }}
                       className={`p-4 border text-left transition-all ${
                         paymentMethod === method
                           ? "border-[#7A1F3D] bg-[#7A1F3D] text-[#F8F5EF]"
@@ -449,60 +585,94 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {paymentMethod === "Cash on Delivery" && (
+              {orderChannel === "online" && (
+                <>
+                  {paymentMethod === "Cash on Delivery" && (
+                    <div className="p-4 bg-[#F8F5EF] border border-[#E5DEC9] text-xs text-[#6E6A64] leading-relaxed">
+                      You will pay{" "}
+                      <strong className="text-[#292725]">
+                        {formatPrice(total)}
+                      </strong>{" "}
+                      in cash when our courier delivers your order to your
+                      doorstep.
+                    </div>
+                  )}
+
+                  {paymentMethod === "bKash" && (
+                    <div className="p-5 bg-[#EFECE4]/70 border border-[#7A1F3D]/40 space-y-3 text-xs">
+                      <p className="uppercase tracking-[0.15em] text-[#7A1F3D] font-medium">
+                        bKash Payment Instructions &middot;{" "}
+                        {settings.bkashNumber}
+                      </p>
+                      <p className="text-[#292725] leading-relaxed">
+                        {settings.bkashInstructions}
+                      </p>
+                      <div className="pt-1">
+                        <label className="block text-[11px] uppercase tracking-wider text-[#292725] mb-1">
+                          bKash Transaction ID (TrxID) — Optional if sending via
+                          WhatsApp
+                        </label>
+                        <input
+                          type="text"
+                          value={paymentTransactionId}
+                          onChange={(e) =>
+                            setPaymentTransactionId(e.target.value)
+                          }
+                          placeholder="e.g., BK9482716XM"
+                          className="w-full px-3.5 py-2.5 bg-white border border-[#E5DEC9] font-mono text-xs text-[#292725]"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {paymentMethod === "Nagad" && (
+                    <div className="p-5 bg-[#EFECE4]/70 border border-[#7A1F3D]/40 space-y-3 text-xs">
+                      <p className="uppercase tracking-[0.15em] text-[#7A1F3D] font-medium">
+                        Nagad Payment Instructions &middot;{" "}
+                        {settings.nagadNumber}
+                      </p>
+                      <p className="text-[#292725] leading-relaxed">
+                        {settings.nagadInstructions}
+                      </p>
+                      <div className="pt-1">
+                        <label className="block text-[11px] uppercase tracking-wider text-[#292725] mb-1">
+                          Nagad Transaction ID — Optional if sending via
+                          WhatsApp
+                        </label>
+                        <input
+                          type="text"
+                          value={paymentTransactionId}
+                          onChange={(e) =>
+                            setPaymentTransactionId(e.target.value)
+                          }
+                          placeholder="e.g., NG7381920PL"
+                          className="w-full px-3.5 py-2.5 bg-white border border-[#E5DEC9] font-mono text-xs text-[#292725]"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {orderChannel === "whatsapp" && (
                 <div className="p-4 bg-[#F8F5EF] border border-[#E5DEC9] text-xs text-[#6E6A64] leading-relaxed">
-                  You will pay{" "}
-                  <strong className="text-[#292725]">
-                    {formatPrice(total)}
-                  </strong>{" "}
-                  in cash when our courier delivers your order to your doorstep.
-                </div>
-              )}
-
-              {paymentMethod === "bKash" && (
-                <div className="p-5 bg-[#EFECE4]/70 border border-[#7A1F3D]/40 space-y-3 text-xs">
-                  <p className="uppercase tracking-[0.15em] text-[#7A1F3D] font-medium">
-                    bKash Payment Instructions &middot; {settings.bkashNumber}
-                  </p>
-                  <p className="text-[#292725] leading-relaxed">
-                    {settings.bkashInstructions}
-                  </p>
-                  <div className="pt-1">
-                    <label className="block text-[11px] uppercase tracking-wider text-[#292725] mb-1">
-                      bKash Transaction ID (TrxID) — Optional if sending via
-                      WhatsApp
-                    </label>
-                    <input
-                      type="text"
-                      value={paymentTransactionId}
-                      onChange={(e) => setPaymentTransactionId(e.target.value)}
-                      placeholder="e.g., BK9482716XM"
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E5DEC9] font-mono text-xs text-[#292725]"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {paymentMethod === "Nagad" && (
-                <div className="p-5 bg-[#EFECE4]/70 border border-[#7A1F3D]/40 space-y-3 text-xs">
-                  <p className="uppercase tracking-[0.15em] text-[#7A1F3D] font-medium">
-                    Nagad Payment Instructions &middot; {settings.nagadNumber}
-                  </p>
-                  <p className="text-[#292725] leading-relaxed">
-                    {settings.nagadInstructions}
-                  </p>
-                  <div className="pt-1">
-                    <label className="block text-[11px] uppercase tracking-wider text-[#292725] mb-1">
-                      Nagad Transaction ID — Optional if sending via WhatsApp
-                    </label>
-                    <input
-                      type="text"
-                      value={paymentTransactionId}
-                      onChange={(e) => setPaymentTransactionId(e.target.value)}
-                      placeholder="e.g., NG7381920PL"
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E5DEC9] font-mono text-xs text-[#292725]"
-                    />
-                  </div>
+                  {paymentMethod === "Cash on Delivery" ? (
+                    <>
+                      You will pay{" "}
+                      <strong className="text-[#292725]">
+                        {formatPrice(total)}
+                      </strong>{" "}
+                      in cash when the courier delivers — no advance payment
+                      needed.
+                    </>
+                  ) : (
+                    <>
+                      We will share the{" "}
+                      <strong className="text-[#292725]">{paymentMethod}</strong>{" "}
+                      payment instructions in the WhatsApp chat after you confirm
+                      the order.
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -568,13 +738,30 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={submitting || cart.length === 0}
-              className="w-full py-4 px-6 bg-[#7A1F3D] btn-sheen hover:bg-[#61182F] disabled:opacity-50 text-[#F8F5EF] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className={`w-full py-4 px-6 btn-sheen disabled:opacity-50 text-[#F8F5EF] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2 cursor-pointer ${
+                orderChannel === "whatsapp"
+                  ? "bg-[#4A6B53] hover:bg-[#3A5544]"
+                  : "bg-[#7A1F3D] hover:bg-[#61182F]"
+              }`}
             >
-              <ShieldCheck className="w-4 h-4" />
+              {orderChannel === "whatsapp" ? (
+                <MessageCircle className="w-4 h-4" />
+              ) : (
+                <ShieldCheck className="w-4 h-4" />
+              )}
               <span>
-                {submitting ? "Placing Your Order..." : "Confirm & Place Order"}
+                {submitting
+                  ? "Placing Your Order..."
+                  : orderChannel === "whatsapp"
+                  ? "Order via WhatsApp"
+                  : "Confirm & Place Order"}
               </span>
             </button>
+            {orderChannel === "whatsapp" && (
+              <p className="text-center text-[11px] text-[#6E6A64]">
+                You will be redirected to WhatsApp with your order pre-filled.
+              </p>
+            )}
           </div>
         </form>
       </div>

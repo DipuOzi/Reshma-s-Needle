@@ -225,7 +225,7 @@ export default function ProductDetailsPage() {
                 <span
                   className={`text-xs uppercase tracking-[0.14em] px-2.5 py-0.5 ${
                     product.inStock
-                      ? "bg-[#A8B5A0]/30 text-[#292725]"
+                      ? "bg-[#7CA982]/30 text-[#292725]"
                       : "bg-[#9E3B3B]/15 text-[#9E3B3B]"
                   }`}
                 >

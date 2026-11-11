@@ -51,7 +51,7 @@ function FooterLink({
       >
         <span
           aria-hidden="true"
-          className="h-1 w-1 rounded-full bg-[#A8B5A0] transition-all duration-300 group-hover/link:bg-[#7A1F3D] group-hover/link:shadow-[0_0_6px_rgba(122,31,61,0.5)]"
+          className="h-1 w-1 rounded-full bg-[#7CA982] transition-all duration-300 group-hover/link:bg-[#7A1F3D] group-hover/link:shadow-[0_0_6px_rgba(122,31,61,0.5)]"
         />
         <span className="border-b border-transparent transition-colors group-hover/link:border-[#7A1F3D]/40">
           {children}
@@ -85,7 +85,7 @@ export function Footer() {
             },
             {
               kind: "spool",
-              className: "absolute -left-6 bottom-24 hidden w-24 rotate-6 text-[#A8B5A0]/40 xl:block",
+              className: "absolute -left-6 bottom-24 hidden w-24 rotate-6 text-[#7CA982]/40 xl:block",
               animation: "float",
             },
             {
@@ -115,7 +115,7 @@ export function Footer() {
                 >
                   <span
                     aria-hidden="true"
-                    className="h-1 w-1 rounded-full bg-[#A8B5A0] transition-colors group-hover/soc:bg-[#7A1F3D]"
+                    className="h-1 w-1 rounded-full bg-[#7CA982] transition-colors group-hover/soc:bg-[#7A1F3D]"
                   />
                   Instagram
                 </a>
@@ -127,7 +127,7 @@ export function Footer() {
                 >
                   <span
                     aria-hidden="true"
-                    className="h-1 w-1 rounded-full bg-[#A8B5A0] transition-colors group-hover/soc:bg-[#7A1F3D]"
+                    className="h-1 w-1 rounded-full bg-[#7CA982] transition-colors group-hover/soc:bg-[#7A1F3D]"
                   />
                   Facebook
                 </a>
@@ -176,7 +176,7 @@ export function Footer() {
                       href={`https://wa.me/${cleanWhatsapp}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-sheen inline-flex items-center gap-2.5 bg-[#F8F5EF] px-6 py-3 text-xs uppercase tracking-[0.18em] text-[#7A1F3D] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#A8B5A0] hover:text-[#292725]"
+                      className="btn-sheen inline-flex items-center gap-2.5 bg-[#F8F5EF] px-6 py-3 text-xs uppercase tracking-[0.18em] text-[#7A1F3D] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#7CA982] hover:text-[#292725]"
                     >
                       <MessageCircle className="h-4 w-4" />
                       <span>WhatsApp the Atelier</span>
@@ -266,8 +266,8 @@ export function Footer() {
                 </p>
                 <p className="inline-flex items-center gap-2 pt-0.5 text-[11px] uppercase tracking-[0.16em] text-[#292725]/55">
                   <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#A8B5A0]/70" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#A8B5A0]" />
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7CA982]/70" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7CA982]" />
                   </span>
                   Reservations on WhatsApp
                 </p>

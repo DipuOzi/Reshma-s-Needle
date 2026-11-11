@@ -187,7 +187,11 @@ export function Motif({ kind, className = "", style, animation = "none" }: Motif
   const animClass = animation !== "none" ? ANIMATION_CLASS[animation] ?? "" : "";
 
   return (
-    <span aria-hidden="true" className={`pointer-events-none select-none ${className}`} style={style}>
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none inline-block select-none ${className}`}
+      style={style}
+    >
       <span
         className={`block h-full w-full [&_svg]:block [&_svg]:h-full [&_svg]:w-full ${animClass}`}
       >
@@ -213,7 +217,7 @@ type BackdropItem = {
  * <AtelierBackdrop
  *   items={[
  *     { kind: "needle", className: "absolute right-10 top-0 w-40 text-[#7A1F3D]/10", animation: "float" },
- *     { kind: "button", className: "absolute left-12 bottom-10 w-14 text-[#A8B5A0]/30" },
+ *     { kind: "button", className: "absolute left-12 bottom-10 w-14 text-[#7CA982]/30" },
  *   ]}
  * />
  * ```
