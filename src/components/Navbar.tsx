@@ -190,7 +190,7 @@ export function Navbar() {
             >
               <Menu className="w-5 h-5 stroke-[1.5]" />
             </button>
-            <div className="max-[359px]:[&_img]:h-16">
+            <div className="max-[359px]:[&_img]:h-16 translate-y-[6px]">
               <BrandLogo size="md" />
             </div>
           </div>
@@ -208,7 +208,7 @@ export function Navbar() {
             {/* Sliding pill background (no capsule behind the whole menu) */}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 h-10 -translate-y-1/2 rounded-full bg-[#8FBC98] shadow-[0_4px_14px_rgba(74,107,83,0.3)] transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="pointer-events-none absolute top-1/2 h-10 -translate-y-1/2 rounded-full bg-[#292725] shadow-[0_4px_14px_rgba(41,39,37,0.25)] transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{ left: pill.left, width: pill.width, opacity: pill.opacity }}
             />
             {MAIN_LINKS.map((link, index) => {
@@ -238,12 +238,12 @@ export function Navbar() {
                   }`}
                 >
                   {link.label}
-                  {/* Dot underneath the active item: ivory while the dark pill
+                  {/* Dot underneath the active item: sage green while the dark pill
                       covers it, wine/maroon once the pill moves away on hover */}
                   <span
                     className={`absolute left-1/2 -translate-x-1/2 bottom-[2px] h-1 w-1 rounded-full transition-[opacity,background-color] duration-300 ${
                       isActive ? "opacity-100" : "opacity-0"
-                    } ${underPill ? "bg-[#F8F5EF]" : "bg-[#7A1F3D]"}`}
+                    } ${underPill ? "bg-[#8FBC98]" : "bg-[#7A1F3D]"}`}
                   />
                 </Link>
               );
