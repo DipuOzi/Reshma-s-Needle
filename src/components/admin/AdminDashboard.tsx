@@ -16,6 +16,7 @@ import {
   Image as ImageIcon,
   LogOut,
   ExternalLink,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { ContentManager } from "./ContentManager";
@@ -55,6 +56,20 @@ interface AdminOrderRecord {
   total: number;
   status: string;
   createdAt: string;
+}
+
+interface AdminCustomerRecord {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  address: string;
+  createdAt: string;
+  hasSavedMeasurements: boolean;
+  orderCount: number;
+  totalSpent: number;
+  lastOrderAt: string | null;
 }
 
 interface AdminTailoringRecord {
@@ -118,12 +133,13 @@ export function AdminDashboard() {
   const { settings, refreshSettings, setContent, showToast } = useStore();
 
   const [activeTab, setActiveTab] = useState<
-    "products" | "tailoring" | "orders" | "content" | "settings"
+    "products" | "tailoring" | "orders" | "customers" | "content" | "settings"
   >("products");
 
   const [products, setProducts] = useState<ProductRecord[]>([]);
   const [deletedProductIds, setDeletedProductIds] = useState<number[]>([]);
   const [orders, setOrders] = useState<AdminOrderRecord[]>([]);
+  const [customers, setCustomers] = useState<AdminCustomerRecord[]>([]);
   const [tailoringRequests, setTailoringRequests] = useState<
     AdminTailoringRecord[]
   >([]);
@@ -153,6 +169,10 @@ export function AdminDashboard() {
   const [prodStockCount, setProdStockCount] = useState("10");
   const [prodFeatured, setProdFeatured] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
+
+  // Orders tab: search & status filters
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("All");
 
   // Settings Form State
   const [settingsForm, setSettingsForm] =
@@ -196,10 +216,11 @@ export function AdminDashboard() {
   const loadAllAdminData = useCallback(async () => {
     setLoading(true);
     try {
-      const [pRes, oRes, tRes] = await Promise.all([
+      const [pRes, oRes, tRes, cRes] = await Promise.all([
         adminFetch("/api/products", { cache: "no-store" }),
         adminFetch("/api/orders", { cache: "no-store" }),
         adminFetch("/api/tailoring", { cache: "no-store" }),
+        adminFetch("/api/customers", { cache: "no-store" }),
       ]);
       if (pRes.ok) {
         const pData = await pRes.json();
@@ -219,6 +240,10 @@ export function AdminDashboard() {
       if (tRes.ok) {
         const tData = await tRes.json();
         setTailoringRequests(tData.requests || []);
+      }
+      if (cRes.ok) {
+        const cData = await cRes.json();
+        setCustomers(cData.customers || []);
       }
     } catch {
       // ignore
@@ -388,7 +413,31 @@ export function AdminDashboard() {
     }
   };
 
-  const handleUpdateTailoringStatus = async (reqId: number, status: string) => {
+  // Orders tab: search + status filtering with live counts
+  const filteredOrders = orders.filter((order) => {
+    const matchesStatus =
+      orderStatusFilter === "All" || order.status === orderStatusFilter;
+    const query = orderSearch.trim().toLowerCase();
+    const matchesSearch =
+      query === "" ||
+      [
+        order.orderNumber,
+        order.customerName,
+        order.phone,
+        order.whatsapp,
+        order.customerEmail,
+        order.paymentMethod,
+        order.paymentTransactionId,
+      ]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(query));
+    return matchesStatus && matchesSearch;
+  });
+
+  const handleUpdateTailoringStatus = async (
+    reqId: number,
+    status: string
+  ) => {
     try {
       const res = await adminFetch(`/api/tailoring/${reqId}`, {
         method: "PATCH",
@@ -536,7 +585,7 @@ export function AdminDashboard() {
             <span
               aria-hidden="true"
               className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                pendingCount > 0 ? "bg-[#C6A15B]" : "bg-[#A8B5A0]"
+                pendingCount > 0 ? "bg-[#C6A15B]" : "bg-[#7CA982]"
               }`}
             />
             <div>
@@ -583,13 +632,18 @@ export function AdminDashboard() {
               icon: ShoppingBag,
             },
             {
+              id: "customers",
+              label: `4. Registered Customers (${customers.length})`,
+              icon: Users,
+            },
+            {
               id: "content",
-              label: "4. Page Content & Images",
+              label: "5. Page Content & Images",
               icon: ImageIcon,
             },
             {
               id: "settings",
-              label: "5. WhatsApp, Delivery & Payment",
+              label: "6. WhatsApp, Delivery & Payment",
               icon: Settings,
             },
           ].map((tab) => {
@@ -601,7 +655,7 @@ export function AdminDashboard() {
                 type="button"
                 onClick={() =>
                   setActiveTab(
-                    tab.id as "products" | "tailoring" | "orders" | "content" | "settings"
+                    tab.id as "products" | "tailoring" | "orders" | "customers" | "content" | "settings"
                   )
                 }
                 className={`px-5 py-3 text-xs uppercase tracking-[0.15em] border transition-colors inline-flex items-center gap-2 ${
@@ -1161,14 +1215,62 @@ export function AdminDashboard() {
         {/* TAB 3: CUSTOMER ORDERS */}
         {activeTab === "orders" && (
           <div className="space-y-6">
+            {/* Search & status filter bar */}
+            <div className="bg-white border border-[#E5DEC9] p-4 sm:p-5 space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+                <input
+                  type="search"
+                  value={orderSearch}
+                  onChange={(e) => setOrderSearch(e.target.value)}
+                  placeholder="Search by order #, customer name, phone, email, payment method, or TrxID..."
+                  className="w-full lg:max-w-md px-4 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-xs text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                />
+                <div className="flex flex-wrap items-center gap-2">
+                  {["All", ...ORDER_STATUSES].map((st) => {
+                    const count =
+                      st === "All"
+                        ? orders.length
+                        : orders.filter((o) => o.status === st).length;
+                    const active = orderStatusFilter === st;
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setOrderStatusFilter(st)}
+                        className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] border transition-colors ${
+                          active
+                            ? "bg-[#7A1F3D] border-[#7A1F3D] text-[#F8F5EF]"
+                            : "bg-[#F8F5EF] border-[#E5DEC9] text-[#292725] hover:border-[#7A1F3D]"
+                        }`}
+                      >
+                        {st} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <p className="text-[11px] text-[#6E6A64]">
+                Showing {filteredOrders.length} of {orders.length} orders
+              </p>
+            </div>
+
             {orders.length === 0 ? (
               <div className="bg-white border border-[#E5DEC9] p-12 text-center">
                 <p className="font-serif text-2xl text-[#292725]">
                   No customer orders yet
                 </p>
               </div>
+            ) : filteredOrders.length === 0 ? (
+              <div className="bg-white border border-[#E5DEC9] p-12 text-center">
+                <p className="font-serif text-2xl text-[#292725]">
+                  No orders match this search or filter
+                </p>
+                <p className="text-sm text-[#6E6A64] mt-2">
+                  Try a different keyword or status.
+                </p>
+              </div>
             ) : (
-              orders.map((order) => (
+              filteredOrders.map((order) => (
                 <div
                   key={order.id}
                   className="bg-white border border-[#E5DEC9] p-6 space-y-5"
@@ -1192,9 +1294,20 @@ export function AdminDashboard() {
                           ? ` (TrxID: ${order.paymentTransactionId})`
                           : ""}
                       </p>
+                      <p className="text-[11px] text-[#6E6A64] mt-1">
+                        Placed:{" "}
+                        {new Date(order.createdAt).toLocaleString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                        {order.customerEmail ? ` · ${order.customerEmail}` : ""}
+                      </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                       <label className="text-xs uppercase tracking-wider text-[#6E6A64]">
                         Status:
                       </label>
@@ -1211,6 +1324,20 @@ export function AdminDashboard() {
                           </option>
                         ))}
                       </select>
+                      <a
+                        href={`https://wa.me/${order.whatsapp.replace(
+                          /[^0-9]/g,
+                          ""
+                        )}?text=${encodeURIComponent(
+                          `Hello ${order.customerName}! This is Reshma's Needle regarding your Order #${order.orderNumber} (status: ${order.status}, total ${formatPrice(order.total)}).`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#7A1F3D] text-[#F8F5EF] text-xs uppercase tracking-wider hover:bg-[#61182F] transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Message Client</span>
+                      </a>
                     </div>
                   </div>
 
@@ -1245,6 +1372,15 @@ export function AdminDashboard() {
                           </span>
                         </div>
                       ))}
+                      <div className="pt-2 border-t border-[#E5DEC9] flex flex-wrap items-center justify-between gap-2 font-medium text-[#292725]">
+                        <span>
+                          Subtotal {formatPrice(order.subtotal)} + Delivery{" "}
+                          {formatPrice(order.deliveryCharge)}
+                        </span>
+                        <span className="font-mono text-[#7A1F3D]">
+                          Total {formatPrice(order.total)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1253,9 +1389,99 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {/* TAB 4: WEBSITE CONTENT, WHATSAPP & PAYMENT SETTINGS */}
+        {/* TAB 4: REGISTERED CUSTOMER ACCOUNTS */}
+        {activeTab === "customers" && (
+          <div className="space-y-6">
+            <div className="bg-white border border-[#E5DEC9] p-4 sm:p-5">
+              <h2 className="font-serif text-2xl text-[#292725]">
+                Registered Customers
+              </h2>
+              <p className="text-xs text-[#6E6A64] mt-1">
+                Every account created on the storefront, with its delivery
+                details and order history summary (matched by email).
+              </p>
+            </div>
+
+            {customers.length === 0 ? (
+              <div className="bg-white border border-[#E5DEC9] p-12 text-center">
+                <p className="font-serif text-2xl text-[#292725]">
+                  No registered customer accounts yet
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white border border-[#E5DEC9] overflow-x-auto">
+                <table className="w-full min-w-[900px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[#E5DEC9] bg-[#F8F5EF] text-[10px] uppercase tracking-[0.14em] text-[#6E6A64]">
+                      <th className="px-4 py-3 font-medium">Customer</th>
+                      <th className="px-4 py-3 font-medium">Phone / WhatsApp</th>
+                      <th className="px-4 py-3 font-medium">Address</th>
+                      <th className="px-4 py-3 font-medium">Joined</th>
+                      <th className="px-4 py-3 font-medium text-center">Orders</th>
+                      <th className="px-4 py-3 font-medium text-right">Total Spent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {customers.map((c) => (
+                      <tr
+                        key={c.id}
+                        className="border-b border-[#E5DEC9]/70 align-top last:border-b-0"
+                      >
+                        <td className="px-4 py-4">
+                          <p className="font-medium text-[#292725]">{c.name}</p>
+                          <p className="text-xs text-[#6E6A64]">{c.email}</p>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {c.hasSavedMeasurements && (
+                              <span className="border border-[#7CA982] bg-[#DEEAE0] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-[#4A6B53]">
+                                Measurements saved
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-xs text-[#292725]">
+                          <p>{c.phone}</p>
+                          <p className="text-[#6E6A64]">{c.whatsapp}</p>
+                        </td>
+                        <td className="px-4 py-4 text-xs text-[#6E6A64] max-w-[220px]">
+                          {c.address}
+                        </td>
+                        <td className="px-4 py-4 text-xs text-[#6E6A64]">
+                          {new Date(c.createdAt).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="px-4 py-4 text-center text-xs">
+                          <span className="font-medium text-[#292725]">
+                            {c.orderCount}
+                          </span>
+                          {c.lastOrderAt && (
+                            <p className="text-[10px] text-[#6E6A64]">
+                              last{" "}
+                              {new Date(c.lastOrderAt).toLocaleDateString(
+                                "en-GB",
+                                { day: "2-digit", month: "short" }
+                              )}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 text-right text-xs font-medium text-[#7A1F3D]">
+                          {formatPrice(c.totalSpent)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 5: WEBSITE CONTENT */}
         {activeTab === "content" && <ContentManager />}
 
+        {/* TAB 6: WHATSAPP & PAYMENT SETTINGS */}
         {activeTab === "settings" && (
           <form
             onSubmit={handleSaveSettings}

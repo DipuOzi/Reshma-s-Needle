@@ -146,7 +146,7 @@ export function ContentManager() {
             <span className="inline-flex items-center gap-1.5 border border-[#E5DEC9] bg-[#F8F5EF] px-4 py-2.5 text-xs uppercase tracking-[0.14em] text-[#6E6A64]">
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  isDirty ? "bg-[#C6A15B]" : "bg-[#A8B5A0]"
+                  isDirty ? "bg-[#C6A15B]" : "bg-[#7CA982]"
                 }`}
               />
               {isDirty ? "Draft saved" : "No draft changes"}

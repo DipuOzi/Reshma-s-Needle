@@ -9,6 +9,7 @@ import {
   ArrowRight,
   ShoppingBag,
   Scissors,
+  MessageCircle,
 } from "lucide-react";
 import { useStore, formatPrice } from "@/context/StoreContext";
 import { Motif, StitchRule } from "@/components/AtelierDecor";
@@ -29,6 +30,31 @@ export default function CartPage() {
       : settings.deliveryChargeOutside;
 
   const total = subtotal + deliveryFee;
+
+  const cleanOwnerWa = settings.whatsappNumber.replace(/[^0-9]/g, "");
+  const waCartMessage = encodeURIComponent(
+    [
+      "Hello Reshma's Needle! I would like to place an order via WhatsApp.",
+      "",
+      "Order Items",
+      ...cart.map(
+        (item, i) =>
+          `${i + 1}. ${item.name} × ${item.quantity} — ${item.purchaseMode} · ${
+            item.selectedColor
+          } · ${item.selectedSize} — ${formatPrice(
+            item.unitPrice * item.quantity
+          )}`
+      ),
+      "",
+      `Subtotal: ${formatPrice(subtotal)}`,
+      `Estimated Delivery (${
+        deliveryZone === "inside" ? "Inside Dhaka" : "Outside Dhaka"
+      }): ${formatPrice(deliveryFee)}`,
+      `Estimated Total: ${formatPrice(total)}`,
+      "",
+      "Please confirm availability, delivery details, and payment in this chat.",
+    ].join("\n")
+  );
 
   return (
     <div className="bg-ivory-rich relative min-h-screen py-14 lg:py-20">
@@ -257,13 +283,31 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <Link
-                href="/checkout"
-                className="w-full py-4 px-6 bg-[#7A1F3D] btn-sheen hover:bg-[#61182F] text-[#F8F5EF] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2"
-              >
-                <span>{page.checkoutCta}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="space-y-2.5">
+                <Link
+                  href="/checkout"
+                  className="w-full py-4 px-6 bg-[#7A1F3D] btn-sheen hover:bg-[#61182F] text-[#F8F5EF] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2"
+                >
+                  <span>{page.checkoutCta}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <p className="text-center text-[10px] uppercase tracking-[0.16em] text-[#6E6A64]">
+                  — or order directly via —
+                </p>
+                <a
+                  href={`https://wa.me/${cleanOwnerWa}?text=${waCartMessage}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-4 px-6 border border-[#4A6B53] text-[#4A6B53] text-xs uppercase tracking-[0.18em] transition-colors flex items-center justify-center gap-2 hover:bg-[#4A6B53] hover:text-[#F8F5EF]"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>WhatsApp</span>
+                </a>
+                <p className="text-center text-[11px] text-[#6E6A64]">
+                  No account needed — we confirm your order directly in the
+                  chat.
+                </p>
+              </div>
             </div>
           </div>
         )}

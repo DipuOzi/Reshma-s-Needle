@@ -46,15 +46,15 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={() => setQuickViewProduct(product)}
-            className="flex-1 bg-[#F8F5EF]/95 hover:bg-[#292725] text-[#292725] hover:text-[#F8F5EF] py-2.5 px-3 text-[11px] uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+            className="flex-1 bg-[#F8F5EF]/95 hover:bg-[#292725] text-[#292725] hover:text-[#F8F5EF] py-2.5 px-2 text-[10px] uppercase tracking-[0.12em] sm:px-3 sm:text-[11px] sm:tracking-[0.15em] transition-colors flex items-center justify-center gap-1.5 shadow-sm"
           >
-            <Eye className="w-3.5 h-3.5 stroke-[1.5]" />
+            <Eye className="w-3.5 h-3.5 shrink-0 stroke-[1.5]" />
             <span>Quick View</span>
           </button>
           <Link
             href={`/customize?productId=${product.id}`}
             title="Get It Custom Stitched"
-            className="bg-[#7A1F3D]/95 hover:bg-[#61182F] text-[#F8F5EF] py-2.5 px-3 text-[11px] uppercase tracking-[0.14em] transition-colors flex items-center justify-center gap-1 shadow-sm"
+            className="bg-[#7A1F3D]/95 hover:bg-[#61182F] text-[#F8F5EF] py-2.5 px-2 sm:px-3 text-[10px] sm:text-[11px] uppercase tracking-[0.14em] transition-colors flex items-center justify-center gap-1 shadow-sm"
           >
             <Scissors className="w-3.5 h-3.5 stroke-[1.5]" />
             <span className="hidden sm:inline">Bespoke</span>
@@ -67,7 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-start justify-between gap-3">
           <Link
             href={`/product/${product.slug}`}
-            className="font-serif text-xl text-[#292725] group-hover:text-[#7A1F3D] transition-colors leading-snug"
+            className="font-serif text-base leading-snug text-[#292725] group-hover:text-[#7A1F3D] transition-colors sm:text-xl"
           >
             {product.name}
           </Link>

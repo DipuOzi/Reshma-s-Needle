@@ -535,7 +535,7 @@ function CustomizeWizardContent() {
                     isCurrent
                       ? "border-[#F8F5EF] bg-[#F8F5EF] text-[#7A1F3D]"
                       : isCompleted
-                      ? "border-[#A8B5A0] bg-[#A8B5A0] text-[#292725]"
+                      ? "border-[#7CA982] bg-[#7CA982] text-[#292725]"
                       : "border-[#F8F5EF]/25 bg-transparent text-[#F8F5EF]/70 hover:border-[#F8F5EF]/60"
                   }`}
                 >

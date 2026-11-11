@@ -88,17 +88,23 @@ export default function HomePage() {
     <div className="bg-[#F8F5EF]">
       {/* 1. Hero: ivory with a soft sage panel behind the campaign photograph */}
       <section className="relative flex min-h-[calc(100svh_-_96px)] items-center overflow-hidden bg-ivory-rich">
+        {/* Two-tone backdrop: ivory on the left, sage panel on the right —
+            same treatment as the About page story section */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 right-0 hidden w-[44%] bg-[#DEEAE0] lg:block"
+        />
         {/* Scattered atelier motifs — needle, scissors, buttons, pins, tape */}
         <AtelierBackdrop
           items={[
             {
               kind: "button",
-              className: "absolute right-10 top-16 hidden w-16 rotate-12 text-[#A8B5A0]/50 lg:block",
+              className: "absolute right-10 top-16 hidden w-16 rotate-12 text-[#7CA982]/50 lg:block",
               animation: "spin",
             },
             {
               kind: "scissors",
-              className: "absolute -left-8 bottom-6 hidden w-28 -rotate-[24deg] text-[#A8B5A0]/40 sm:block",
+              className: "absolute -left-8 bottom-6 hidden w-28 -rotate-[24deg] text-[#7CA982]/40 sm:block",
               animation: "sway",
             },
             {
@@ -125,54 +131,61 @@ export default function HomePage() {
 
         <div className="relative mx-auto w-full max-w-[1440px] px-5 py-10 sm:px-8 md:py-16 lg:px-14 lg:py-20">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
-            <div className="order-2 space-y-7 lg:order-1 lg:col-span-5">
-              <div className="inline-flex items-center gap-3">
-                <span className="h-px w-8 bg-gradient-to-r from-[#7A1F3D] to-[#C6A15B]" />
-                <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-[#7A1F3D]">
-                  {home.heroEyebrow}
-                </span>
+            {/* On mobile the wrapper dissolves (display:contents) so the copy,
+                the photograph, and the CTAs can be ordered separately:
+                texts → image → buttons. On lg it is one left column again. */}
+            <div className="max-lg:contents lg:order-1 lg:col-span-5 lg:space-y-7">
+              <div className="order-1 space-y-6 sm:space-y-7">
+                <div className="inline-flex items-center gap-3">
+                  <span className="h-px w-8 bg-gradient-to-r from-[#7A1F3D] to-[#C6A15B]" />
+                  <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-[#7A1F3D]">
+                    {home.heroEyebrow}
+                  </span>
+                </div>
+
+                <h1 className="font-serif text-5xl leading-[1.05] tracking-[-0.015em] text-[#292725] sm:text-6xl xl:text-[68px]">
+                  {home.heroHeadline}
+                </h1>
+
+                <p className="max-w-md text-base font-light leading-relaxed text-[#6E6A64] sm:text-lg">
+                  {home.heroSubtext}
+                </p>
               </div>
 
-              <h1 className="font-serif text-5xl leading-[1.05] tracking-[-0.015em] text-[#292725] sm:text-6xl xl:text-[68px]">
-                {home.heroHeadline}
-              </h1>
+              <div className="order-3 space-y-6 sm:space-y-7">
+                <div className="flex flex-col items-stretch gap-4 pt-2 sm:flex-row sm:items-center">
+                  <Link
+                    href="/shop"
+                    className="btn-sheen inline-flex items-center justify-center gap-3 bg-[#7A1F3D] px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#F8F5EF] shadow-[0_10px_24px_rgba(122,31,61,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#61182F] hover:shadow-[0_14px_30px_rgba(198,161,91,0.35)]"
+                  >
+                    <span>{home.heroPrimaryCta}</span>
+                    <ArrowRight className="h-4 w-4 stroke-[1.5]" />
+                  </Link>
 
-              <p className="max-w-md text-base font-light leading-relaxed text-[#6E6A64] sm:text-lg">
-                {home.heroSubtext}
-              </p>
+                  <Link
+                    href="/customize"
+                    className="btn-sheen inline-flex items-center justify-center gap-2.5 border border-[#292725]/80 bg-transparent px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#292725] transition-colors hover:bg-[#292725] hover:text-[#F8F5EF]"
+                  >
+                    <Scissors className="h-4 w-4 stroke-[1.5]" />
+                    <span>{home.heroSecondaryCta}</span>
+                  </Link>
+                </div>
 
-              <div className="flex flex-col items-stretch gap-4 pt-2 sm:flex-row sm:items-center">
-                <Link
-                  href="/shop"
-                  className="btn-sheen inline-flex items-center justify-center gap-3 bg-[#7A1F3D] px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#F8F5EF] shadow-[0_10px_24px_rgba(122,31,61,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#61182F] hover:shadow-[0_14px_30px_rgba(198,161,91,0.35)]"
-                >
-                  <span>{home.heroPrimaryCta}</span>
-                  <ArrowRight className="h-4 w-4 stroke-[1.5]" />
-                </Link>
+                {/* Small stitched courtesy line under the hero CTAs */}
+                <StitchRule
+                  charm="none"
+                  className="max-w-[260px] text-[#7A1F3D]/30"
+                />
 
-                <Link
-                  href="/customize"
-                  className="btn-sheen inline-flex items-center justify-center gap-2.5 border border-[#292725]/80 bg-transparent px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#292725] transition-colors hover:bg-[#292725] hover:text-[#F8F5EF]"
-                >
-                  <Scissors className="h-4 w-4 stroke-[1.5]" />
-                  <span>{home.heroSecondaryCta}</span>
-                </Link>
+                <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#7CA982]">
+                  <Motif kind="pin" className="w-5 h-4 [&>span]:h-4 [&>span]:w-5 [&_svg]:h-4 [&_svg]:w-5" />
+                  <span>Cut · Stitch · Finish — By Hand</span>
+                </p>
               </div>
-
-              {/* Small stitched courtesy line under the hero CTAs */}
-              <StitchRule
-                charm="none"
-                className="max-w-[260px] text-[#7A1F3D]/30"
-              />
-
-              <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#A8B5A0]">
-                <Motif kind="pin" className="w-5 h-4 [&>span]:h-4 [&>span]:w-5 [&_svg]:h-4 [&_svg]:w-5" />
-                <span>Cut · Stitch · Finish — By Hand</span>
-              </p>
             </div>
 
-            <div className="order-1 lg:order-2 lg:col-span-7">
-              <div className="-mx-5 bg-[linear-gradient(200deg,#DFE6D9,#C9D4C1)] px-5 py-6 sm:-mx-8 sm:px-8 lg:mx-0 lg:bg-transparent lg:p-0">
+            <div className="order-2 lg:order-2 lg:col-span-7">
+              <div className="mx-auto w-full max-w-[340px] bg-[linear-gradient(200deg,#E2EEE6,#D1E1D3)] p-5 sm:max-w-md sm:p-7 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0">
                 <div className="relative">
                   <div
                     aria-hidden="true"
@@ -248,7 +261,7 @@ export default function HomePage() {
           items={[
             {
               kind: "spool",
-              className: "absolute right-6 top-10 hidden w-20 rotate-6 text-[#A8B5A0]/35 xl:block",
+              className: "absolute right-6 top-10 hidden w-20 rotate-6 text-[#7CA982]/35 xl:block",
               animation: "float-slow",
             },
             {
@@ -287,7 +300,7 @@ export default function HomePage() {
                   href={`/shop?category=${encodeURIComponent(col.name)}`}
                   className={`group flex flex-col shadow-[0_14px_36px_rgba(41,39,37,0.1)] transition-all duration-500 ${plate.hoverRing}`}
                 >
-                  <div className="relative aspect-[5/6] w-full overflow-hidden bg-[#EFECE4]">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#EFECE4] sm:aspect-[5/6]">
                     <img
                       src={col.image}
                       alt={col.name}
@@ -357,7 +370,7 @@ export default function HomePage() {
               <div className="relative">
                 <div
                   aria-hidden="true"
-                  className="absolute -bottom-4 -left-4 hidden h-full w-full bg-[#A8B5A0]/90 sm:block"
+                  className="absolute -bottom-4 -left-4 hidden h-full w-full bg-[#7CA982]/90 sm:block"
                 />
                 {/* Gold corner ornaments */}
                 <div
@@ -409,7 +422,7 @@ export default function HomePage() {
               <div className="pt-4">
                 <Link
                   href="/customize"
-                  className="btn-sheen inline-flex items-center gap-3 bg-[#F8F5EF] px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#7A1F3D] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#A8B5A0] hover:text-[#292725]"
+                  className="btn-sheen inline-flex items-center gap-3 bg-[#F8F5EF] px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#7A1F3D] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#7CA982] hover:text-[#292725]"
                 >
                   <span>{home.madeCta}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -431,7 +444,7 @@ export default function HomePage() {
             },
             {
               kind: "button",
-              className: "absolute left-6 bottom-24 hidden w-14 -rotate-12 text-[#A8B5A0]/45 xl:block",
+              className: "absolute left-6 bottom-24 hidden w-14 -rotate-12 text-[#7CA982]/45 xl:block",
               animation: "spin",
             },
             {
@@ -462,7 +475,7 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-4">
               {[1, 2, 3, 4].map((n) => (
                 <div key={n} className="animate-pulse space-y-4">
                   <div className="aspect-[3/4] bg-[#E8E3D7]" />
@@ -472,7 +485,7 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-4">
               {featuredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

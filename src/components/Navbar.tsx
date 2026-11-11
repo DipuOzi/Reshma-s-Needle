@@ -59,7 +59,14 @@ export function Navbar() {
   const handleLeaveNav = () => {
     hoverRef.current = null;
     setHoverIndex(null);
-    if (activeIndex !== -1) measurePill(activeIndex);
+    if (activeIndex !== -1) {
+      measurePill(activeIndex);
+    } else {
+      // No active item on this route (e.g. /checkout, /cart) — fade the
+      // pill out instead of leaving it stuck on the last hovered link,
+      // where it would render as a dark blob over dark label text.
+      setPill((prev) => ({ ...prev, opacity: 0 }));
+    }
   };
 
   // Measure reliably: synchronously before paint, again after webfonts load
@@ -154,7 +161,7 @@ export function Navbar() {
 
         {toastMessage && (
           <div className="fixed bottom-24 left-4 right-4 z-50 flex max-w-[calc(100vw_-_2rem)] items-center gap-3 border border-[#7A1F3D]/40 bg-[#292725] px-5 py-3.5 text-[#F8F5EF] shadow-xl animate-fade-in sm:left-auto sm:right-6">
-            <span className="w-2 h-2 rounded-full bg-[#A8B5A0]" />
+            <span className="w-2 h-2 rounded-full bg-[#7CA982]" />
             <span className="text-xs tracking-[0.06em]">{toastMessage}</span>
           </div>
         )}
@@ -280,19 +287,30 @@ export function Navbar() {
       {/* Subtle Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-24 left-4 right-4 z-50 flex max-w-[calc(100vw_-_2rem)] items-center gap-3 border border-[#7A1F3D]/40 bg-[#292725] px-5 py-3.5 text-[#F8F5EF] shadow-xl animate-fade-in sm:left-auto sm:right-6">
-          <span className="w-2 h-2 rounded-full bg-[#A8B5A0]" />
+          <span className="w-2 h-2 rounded-full bg-[#7CA982]" />
           <span className="text-xs tracking-[0.06em]">{toastMessage}</span>
         </div>
       )}
 
-      {/* Mobile Navigation Drawer */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div
-            className="fixed inset-0 bg-[#292725]/40 backdrop-blur-xs"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className="relative z-10 w-[85%] max-w-sm bg-[#F8F5EF] h-full flex flex-col justify-between p-7 border-r border-[#E5DEC9] overflow-y-auto">
+      {/* Mobile Navigation Drawer — slides in and out smoothly */}
+      <div
+        className={`fixed inset-0 z-50 lg:hidden ${
+          mobileMenuOpen ? "" : "pointer-events-none"
+        }`}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <div
+          className={`absolute inset-0 bg-[#292725]/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+            mobileMenuOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        <div
+          inert={!mobileMenuOpen}
+          className={`relative z-10 flex h-full w-[85%] max-w-sm flex-col justify-between overflow-y-auto border-r border-[#E5DEC9] bg-[#F8F5EF] p-7 transform-gpu will-change-transform transition-transform duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
             <div>
               <div className="flex items-center justify-between pb-6 border-b border-[#E5DEC9]">
                 <BrandLogo size="sm" />
@@ -364,9 +382,8 @@ export function Navbar() {
               <p>Bespoke Women&rsquo;s Clothing &amp; Tailoring</p>
               <p className="mt-1 text-[#292725]">Reshma&rsquo;s Needle Atelier</p>
             </div>
-          </div>
         </div>
-      )}
+      </div>
     </>
   );
 }

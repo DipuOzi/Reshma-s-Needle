@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useStore, formatPrice } from "@/context/StoreContext";
 import { Motif, StitchRule } from "@/components/AtelierDecor";
+import { BrandLogo } from "@/components/BrandLogo";
 import type { OrderItemPayload } from "@/db/schema";
 
 interface OrderRecord {
@@ -148,173 +149,224 @@ export default function CustomerAccountPage() {
 
   if (!customer) {
     return (
-      <div className="bg-ivory-rich min-h-screen py-16 lg:py-24">
-        <div className="max-w-md mx-auto px-5">
-          <div className="bg-white border border-[#E5DEC9] p-8 sm:p-10 space-y-6 shadow-[0_18px_40px_rgba(41,39,37,0.08)]">
-            <div className="text-center space-y-2">
+      <div className="bg-ivory-rich flex min-h-screen items-center py-10 lg:py-16">
+        <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
+          <div className="grid grid-cols-1 overflow-hidden border border-[#E5DEC9] bg-white shadow-[0_28px_60px_rgba(41,39,37,0.12)] lg:grid-cols-2">
+            {/* Brand panel — desktop only */}
+            <div className="relative hidden flex-col justify-between overflow-hidden bg-charcoal-rich p-10 text-[#F8F5EF] lg:flex">
+              <div
+                aria-hidden="true"
+                className="gold-hairline absolute left-0 top-0 h-px w-full"
+              />
               <Motif
                 kind="needle"
-                className="mx-auto w-9 text-[#C6A15B]/60"
-                animation="sway"
+                className="absolute -bottom-12 -right-8 w-44 rotate-[14deg] text-[#F8F5EF]/[0.06]"
+                animation="float-slow"
               />
-              <p className="text-xs uppercase tracking-[0.2em] text-[#7A1F3D]">
-                {page.eyebrow}
-              </p>
-              <h1 className="font-serif text-3xl sm:text-4xl text-[#292725]">
-                {authMode === "login" ? page.signInTitle : page.registerTitle}
-              </h1>
-              <p className="text-xs text-[#6E6A64]">
-                {page.intro}
-              </p>
-            </div>
+              <Motif
+                kind="button"
+                className="absolute right-10 top-10 w-12 text-[#E8CE9C]/20"
+                animation="spin"
+              />
 
-            <div className="grid grid-cols-2 border border-[#E5DEC9] p-1 bg-[#F8F5EF]">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("login");
-                  setAuthError(null);
-                }}
-                className={`py-2 text-xs uppercase tracking-[0.15em] ${
-                  authMode === "login"
-                    ? "bg-[#7A1F3D] text-[#F8F5EF]"
-                    : "text-[#292725]"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("register");
-                  setAuthError(null);
-                }}
-                className={`py-2 text-xs uppercase tracking-[0.15em] ${
-                  authMode === "register"
-                    ? "bg-[#7A1F3D] text-[#F8F5EF]"
-                    : "text-[#292725]"
-                }`}
-              >
-                Register
-              </button>
-            </div>
-
-            {authError && (
-              <div className="p-3 bg-[#9E3B3B]/10 border border-[#9E3B3B] text-[#9E3B3B] text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{authError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleAuthSubmit} className="space-y-4">
-              {authMode === "register" && (
-                <>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Samira Chowdhury"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-sm"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1">
-                        Phone *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="01712345678"
-                        className="w-full px-3.5 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1">
-                        WhatsApp
-                      </label>
-                      <input
-                        type="tel"
-                        value={whatsapp}
-                        onChange={(e) => setWhatsapp(e.target.value)}
-                        placeholder="+8801712345678"
-                        className="w-full px-3.5 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1">
-                      Delivery Address *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="House, Road, Area, Dhaka"
-                      className="w-full px-3.5 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-sm"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#F8F5EF] border border-[#E5DEC9] text-sm"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-[#7A1F3D] btn-sheen hover:bg-[#61182F] text-[#F8F5EF] text-xs uppercase tracking-[0.18em] transition-colors cursor-pointer"
-              >
-                {loading
-                  ? "Please wait..."
-                  : authMode === "login"
-                  ? "Sign In to Account"
-                  : "Create Account"}
-              </button>
-            </form>
-
-            {authMode === "login" && (
-              <div className="pt-4 border-t border-[#E5DEC9] text-center space-y-2">
-                <p className="text-[11px] text-[#6E6A64]">
-                  Demo Client Account Pre-filled:{" "}
-                  <span className="font-mono text-[#292725]">
-                    samira@example.com
-                  </span>{" "}
-                  / <span className="font-mono text-[#292725]">reshma2026</span>
+              <div className="relative space-y-8">
+                <BrandLogo variant="light" size="lg" href="/" />
+                <h2 className="font-serif text-3xl leading-snug text-[#F8F5EF]">
+                  Where handloom heritage meets personal tailoring.
+                </h2>
+                <p className="max-w-sm text-sm leading-relaxed text-[#F8F5EF]/70">
+                  Sign in to follow each piece from our cutting table to your
+                  doorstep — and to keep your fit profile ready for every
+                  bespoke commission.
                 </p>
               </div>
-            )}
+
+              <ul className="relative space-y-4 pt-10 text-[11px] uppercase tracking-[0.18em] text-[#F8F5EF]/80">
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#E8CE9C]" />
+                  <span>Track every order in real time</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Scissors className="h-4 w-4 shrink-0 text-[#E8CE9C]" />
+                  <span>Save your atelier measurements</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Package className="h-4 w-4 shrink-0 text-[#E8CE9C]" />
+                  <span>Faster checkout, saved delivery details</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Auth form panel */}
+            <div className="relative p-7 sm:p-10">
+              <div className="space-y-2 text-center">
+                <Motif
+                  kind="needle"
+                  className="mx-auto w-9 text-[#C6A15B]/60"
+                  animation="sway"
+                />
+                <p className="text-xs uppercase tracking-[0.2em] text-[#7A1F3D]">
+                  {page.eyebrow}
+                </p>
+                <h1 className="font-serif text-3xl text-[#292725] sm:text-4xl">
+                  {authMode === "login" ? page.signInTitle : page.registerTitle}
+                </h1>
+                <p className="text-xs leading-relaxed text-[#6E6A64]">
+                  {page.intro}
+                </p>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 border border-[#E5DEC9] bg-[#F8F5EF] p-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("login");
+                    setAuthError(null);
+                  }}
+                  className={`py-2.5 text-xs uppercase tracking-[0.15em] transition-colors ${
+                    authMode === "login"
+                      ? "bg-[#7A1F3D] text-[#F8F5EF]"
+                      : "text-[#292725] hover:text-[#7A1F3D]"
+                  }`}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("register");
+                    setAuthError(null);
+                  }}
+                  className={`py-2.5 text-xs uppercase tracking-[0.15em] transition-colors ${
+                    authMode === "register"
+                      ? "bg-[#7A1F3D] text-[#F8F5EF]"
+                      : "text-[#292725] hover:text-[#7A1F3D]"
+                  }`}
+                >
+                  Register
+                </button>
+              </div>
+
+              {authError && (
+                <div className="mt-4 flex items-center gap-2 border border-[#9E3B3B] bg-[#9E3B3B]/10 p-3 text-xs text-[#9E3B3B]">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{authError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleAuthSubmit} className="mt-5 space-y-4">
+                {authMode === "register" && (
+                  <>
+                    <div>
+                      <label className="mb-1 block text-xs uppercase tracking-wider text-[#292725]">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Samira Chowdhury"
+                        className="w-full border border-[#E5DEC9] bg-[#F8F5EF] px-3.5 py-2.5 text-sm text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1 block text-xs uppercase tracking-wider text-[#292725]">
+                          Phone *
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="01712345678"
+                          className="w-full border border-[#E5DEC9] bg-[#F8F5EF] px-3.5 py-2.5 text-sm text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs uppercase tracking-wider text-[#292725]">
+                          WhatsApp
+                        </label>
+                        <input
+                          type="tel"
+                          value={whatsapp}
+                          onChange={(e) => setWhatsapp(e.target.value)}
+                          placeholder="+8801712345678"
+                          className="w-full border border-[#E5DEC9] bg-[#F8F5EF] px-3.5 py-2.5 text-sm text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs uppercase tracking-wider text-[#292725]">
+                        Delivery Address *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="House, Road, Area, Dhaka"
+                        className="w-full border border-[#E5DEC9] bg-[#F8F5EF] px-3.5 py-2.5 text-sm text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#292725]">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border border-[#E5DEC9] bg-[#F8F5EF] px-3.5 py-2.5 text-sm text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs uppercase tracking-wider text-[#292725]">
+                    Password *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full border border-[#E5DEC9] bg-[#F8F5EF] px-3.5 py-2.5 text-sm text-[#292725] focus:outline-none focus:border-[#7A1F3D]"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-sheen w-full cursor-pointer bg-[#7A1F3D] py-3.5 text-xs uppercase tracking-[0.18em] text-[#F8F5EF] transition-colors hover:bg-[#61182F]"
+                >
+                  {loading
+                    ? "Please wait..."
+                    : authMode === "login"
+                    ? "Sign In to Account"
+                    : "Create Account"}
+                </button>
+              </form>
+
+              {authMode === "login" && (
+                <div className="mt-5 border-t border-[#E5DEC9] pt-4">
+                  <p className="border border-[#E5DEC9] bg-[#F8F5EF] px-4 py-3 text-center text-[11px] leading-relaxed text-[#6E6A64]">
+                    <span className="uppercase tracking-wider">
+                      Demo account:&nbsp;
+                    </span>
+                    <span className="font-mono text-[#292725]">
+                      samira@example.com
+                    </span>{" "}
+                    /{" "}
+                    <span className="font-mono text-[#292725]">reshma2026</span>
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

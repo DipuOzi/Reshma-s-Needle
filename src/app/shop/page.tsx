@@ -144,7 +144,7 @@ function ShopContent() {
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={(e) => setInStockOnly(e.target.checked)}
-                  className="accent-[#A8B5A0] w-3.5 h-3.5"
+                  className="accent-[#7CA982] w-3.5 h-3.5"
                 />
                 <span className="uppercase tracking-[0.14em] text-[#F8F5EF]">
                   In Stock Only
@@ -162,7 +162,7 @@ function ShopContent() {
       {/* Product Grid */}
       <section className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 py-14 lg:py-20">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <div key={n} className="space-y-4 animate-pulse">
                 <div className="aspect-[3/4] bg-[#EFECE4]" />
@@ -193,7 +193,7 @@ function ShopContent() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-14 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-14 lg:grid-cols-3">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
