@@ -1415,11 +1415,11 @@ function CustomizeWizardContent() {
 
             {/* Confirmation Instructions After WhatsApp Opens */}
             {submittedRequestNumber && (
-              <div className="bg-[#EFECE4] border-2 border-[#4A6B53] p-6 sm:p-8 space-y-4 animate-fade-in">
+              <div className="bg-[#EFECE4] border-2 border-[#7CA982] p-6 sm:p-8 space-y-4 animate-fade-in">
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-[#4A6B53] shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-6 h-6 text-[#7CA982] shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <p className="text-xs uppercase tracking-[0.18em] text-[#4A6B53] font-medium">
+                    <p className="text-xs uppercase tracking-[0.18em] text-[#7CA982] font-medium">
                       Fitting Card Logged &middot; Ref #{submittedRequestNumber}
                     </p>
                     <h3 className="font-serif text-2xl text-[#292725]">
@@ -1449,7 +1449,7 @@ function CustomizeWizardContent() {
                       href={generatedWhatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#4A6B53] text-[#F8F5EF] px-5 py-2.5 text-xs uppercase tracking-[0.15em] btn-sheen transition-all duration-300 hover:-translate-y-0.5"
+                      className="inline-flex items-center gap-2 bg-[#7CA982] text-[#F8F5EF] px-5 py-2.5 text-xs uppercase tracking-[0.15em] btn-sheen transition-all duration-300 hover:-translate-y-0.5"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>Open WhatsApp Again</span>
