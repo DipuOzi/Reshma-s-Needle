@@ -105,7 +105,7 @@
     "subtotal": 5950,
     "deliveryCharge": 80,
     "total": 6030,
-    "status": "Pending",
+    "status": "Cancelled",
     "createdAt": "2026-11-11T04:32:30.128Z"
   }
 ]
