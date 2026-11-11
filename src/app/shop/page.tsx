@@ -144,7 +144,7 @@ function ShopContent() {
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={(e) => setInStockOnly(e.target.checked)}
-                  className="accent-[#7CA982] w-3.5 h-3.5"
+                  className="accent-[#4A6B53] w-3.5 h-3.5"
                 />
                 <span className="uppercase tracking-[0.14em] text-[#F8F5EF]">
                   In Stock Only

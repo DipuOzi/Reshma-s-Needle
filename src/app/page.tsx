@@ -99,12 +99,12 @@ export default function HomePage() {
           items={[
             {
               kind: "button",
-              className: "absolute right-10 top-16 hidden w-16 rotate-12 text-[#7CA982]/50 lg:block",
+              className: "absolute right-10 top-16 hidden w-16 rotate-12 text-[#4A6B53]/50 lg:block",
               animation: "spin",
             },
             {
               kind: "scissors",
-              className: "absolute -left-8 bottom-6 hidden w-28 -rotate-[24deg] text-[#7CA982]/40 sm:block",
+              className: "absolute -left-8 bottom-6 hidden w-28 -rotate-[24deg] text-[#4A6B53]/40 sm:block",
               animation: "sway",
             },
             {
@@ -177,7 +177,7 @@ export default function HomePage() {
                   className="max-w-[260px] text-[#7A1F3D]/30"
                 />
 
-                <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#7CA982]">
+                <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#4A6B53]">
                   <Motif kind="pin" className="w-5 h-4 [&>span]:h-4 [&>span]:w-5 [&_svg]:h-4 [&_svg]:w-5" />
                   <span>Cut · Stitch · Finish — By Hand</span>
                 </p>
@@ -261,7 +261,7 @@ export default function HomePage() {
           items={[
             {
               kind: "spool",
-              className: "absolute right-6 top-10 hidden w-20 rotate-6 text-[#7CA982]/35 xl:block",
+              className: "absolute right-6 top-10 hidden w-20 rotate-6 text-[#4A6B53]/35 xl:block",
               animation: "float-slow",
             },
             {
@@ -422,7 +422,7 @@ export default function HomePage() {
               <div className="pt-4">
                 <Link
                   href="/customize"
-                  className="btn-sheen inline-flex items-center gap-3 bg-[#F8F5EF] px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#7A1F3D] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#7CA982] hover:text-[#292725]"
+                  className="btn-sheen inline-flex items-center gap-3 bg-[#F8F5EF] px-8 py-4 text-xs uppercase tracking-[0.18em] text-[#7A1F3D] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#4A6B53] hover:text-[#F8F5EF]"
                 >
                   <span>{home.madeCta}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -444,7 +444,7 @@ export default function HomePage() {
             },
             {
               kind: "button",
-              className: "absolute left-6 bottom-24 hidden w-14 -rotate-12 text-[#7CA982]/45 xl:block",
+              className: "absolute left-6 bottom-24 hidden w-14 -rotate-12 text-[#4A6B53]/45 xl:block",
               animation: "spin",
             },
             {

@@ -585,7 +585,7 @@ export function AdminDashboard() {
             <span
               aria-hidden="true"
               className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                pendingCount > 0 ? "bg-[#C6A15B]" : "bg-[#7CA982]"
+                pendingCount > 0 ? "bg-[#C6A15B]" : "bg-[#4A6B53]"
               }`}
             />
             <div>
@@ -1022,7 +1022,7 @@ export function AdminDashboard() {
                           onClick={() => handleQuickToggleStock(p)}
                           className={`px-3 py-1 text-xs uppercase tracking-wider border ${
                             p.inStock
-                              ? "border-[#7CA982] bg-[#7CA982]/10 text-[#7CA982]"
+                              ? "border-[#4A6B53] bg-[#7CA982]/10 text-[#4A6B53]"
                               : "border-[#9E3B3B] bg-[#9E3B3B]/10 text-[#9E3B3B]"
                           }`}
                         >
@@ -1432,7 +1432,7 @@ export function AdminDashboard() {
                           <p className="text-xs text-[#6E6A64]">{c.email}</p>
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
                             {c.hasSavedMeasurements && (
-                              <span className="border border-[#7CA982] bg-[#7CA982] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-[#F8F5EF]">
+                              <span className="border border-[#4A6B53] bg-[#4A6B53] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-[#F8F5EF]">
                                 Measurements saved
                               </span>
                             )}

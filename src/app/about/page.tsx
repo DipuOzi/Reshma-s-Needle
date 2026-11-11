@@ -32,7 +32,7 @@ export default async function AboutPage() {
             },
             {
               kind: "button",
-              className: "absolute left-6 top-16 hidden w-14 -rotate-12 text-[#7CA982]/50 xl:block",
+              className: "absolute left-6 top-16 hidden w-14 -rotate-12 text-[#4A6B53]/50 xl:block",
               animation: "spin",
             },
             {
@@ -85,7 +85,7 @@ export default async function AboutPage() {
                 {/* Small charm stitched to the frame */}
                 <Motif
                   kind="thimble"
-                  className="absolute -left-5 bottom-10 hidden w-9 rotate-6 text-[#7CA982]/70 sm:block"
+                  className="absolute -left-5 bottom-10 hidden w-9 rotate-6 text-[#4A6B53]/70 sm:block"
                   animation="float"
                 />
               </div>
@@ -118,7 +118,7 @@ export default async function AboutPage() {
         />
         <div className="mx-auto max-w-[1280px] px-5 sm:px-8">
           <div className="mx-auto mb-16 max-w-2xl space-y-3 text-center">
-            <p className="text-xs uppercase tracking-[0.22em] text-[#7CA982]">
+            <p className="text-xs uppercase tracking-[0.22em] text-[#4A6B53]">
               {about.philosophyEyebrow}
             </p>
             <h2 className="font-serif text-4xl sm:text-5xl">
