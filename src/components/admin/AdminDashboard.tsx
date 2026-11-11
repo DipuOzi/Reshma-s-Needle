@@ -1022,7 +1022,7 @@ export function AdminDashboard() {
                           onClick={() => handleQuickToggleStock(p)}
                           className={`px-3 py-1 text-xs uppercase tracking-wider border ${
                             p.inStock
-                              ? "border-[#4A6B53] bg-[#4A6B53]/10 text-[#4A6B53]"
+                              ? "border-[#7CA982] bg-[#7CA982]/10 text-[#7CA982]"
                               : "border-[#9E3B3B] bg-[#9E3B3B]/10 text-[#9E3B3B]"
                           }`}
                         >
@@ -1432,7 +1432,7 @@ export function AdminDashboard() {
                           <p className="text-xs text-[#6E6A64]">{c.email}</p>
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
                             {c.hasSavedMeasurements && (
-                              <span className="border border-[#7CA982] bg-[#DEEAE0] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-[#4A6B53]">
+                              <span className="border border-[#7CA982] bg-[#7CA982] px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-[#F8F5EF]">
                                 Measurements saved
                               </span>
                             )}

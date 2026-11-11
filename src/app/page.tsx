@@ -92,7 +92,7 @@ export default function HomePage() {
             same treatment as the About page story section */}
         <div
           aria-hidden="true"
-          className="absolute inset-y-0 right-0 hidden w-[44%] bg-[#DEEAE0] lg:block"
+          className="absolute inset-y-0 right-0 hidden w-[44%] bg-[#7CA982] lg:block"
         />
         {/* Scattered atelier motifs — needle, scissors, buttons, pins, tape */}
         <AtelierBackdrop
@@ -185,7 +185,7 @@ export default function HomePage() {
             </div>
 
             <div className="order-2 lg:order-2 lg:col-span-7">
-              <div className="mx-auto w-full max-w-[340px] bg-[linear-gradient(200deg,#E2EEE6,#D1E1D3)] p-5 sm:max-w-md sm:p-7 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0">
+              <div className="mx-auto w-full max-w-[340px] bg-[linear-gradient(200deg,#7CA982,#7CA982)] p-5 sm:max-w-md sm:p-7 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0">
                 <div className="relative">
                   <div
                     aria-hidden="true"
