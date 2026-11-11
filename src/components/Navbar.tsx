@@ -197,7 +197,8 @@ export function Navbar() {
 
           {/* Center: Main navigation with a sliding dark pill.
               The pill travels smoothly to the hovered item; the active item
-              keeps the pill plus a small wine dot underneath. */}
+              shows a dot underneath — ivory under the pill, wine when the
+              pill has travelled elsewhere. */}
           <nav
             ref={navRef}
             aria-label="Main Navigation"
@@ -237,11 +238,12 @@ export function Navbar() {
                   }`}
                 >
                   {link.label}
-                  {/* Wine dot underneath the active menu item */}
+                  {/* Dot underneath the active item: ivory while the dark pill
+                      covers it, wine/maroon once the pill moves away on hover */}
                   <span
-                    className={`absolute left-1/2 -translate-x-1/2 bottom-[2px] h-1 w-1 rounded-full bg-[#7A1F3D] transition-opacity duration-300 ${
+                    className={`absolute left-1/2 -translate-x-1/2 bottom-[2px] h-1 w-1 rounded-full transition-[opacity,background-color] duration-300 ${
                       isActive ? "opacity-100" : "opacity-0"
-                    }`}
+                    } ${underPill ? "bg-[#F8F5EF]" : "bg-[#7A1F3D]"}`}
                   />
                 </Link>
               );
