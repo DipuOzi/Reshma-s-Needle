@@ -135,24 +135,25 @@ export default function HomePage() {
                 the photograph, and the CTAs can be ordered separately:
                 texts → image → buttons. On lg it is one left column again. */}
             <div className="max-lg:contents lg:order-1 lg:col-span-5 lg:space-y-7">
-              <div className="order-1 space-y-6 sm:space-y-7">
+              <div className="order-1 space-y-6 max-lg:flex max-lg:flex-col max-lg:items-center max-lg:text-center sm:space-y-7">
                 <div className="inline-flex items-center gap-3">
                   <span className="h-px w-8 bg-gradient-to-r from-[#7A1F3D] to-[#C6A15B]" />
                   <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-[#7A1F3D]">
                     {home.heroEyebrow}
                   </span>
+                  <span className="hidden h-px w-8 max-lg:block bg-gradient-to-l from-[#7A1F3D] to-[#C6A15B]" />
                 </div>
 
-                <h1 className="font-serif text-5xl leading-[1.05] tracking-[-0.015em] text-[#292725] sm:text-6xl xl:text-[68px]">
+                <h1 className="font-serif text-5xl leading-[1.05] tracking-[-0.015em] text-[#292725] max-lg:text-4xl sm:text-6xl xl:text-[68px]">
                   {home.heroHeadline}
                 </h1>
 
-                <p className="max-w-md text-base font-light leading-relaxed text-[#6E6A64] sm:text-lg">
+                <p className="max-w-md text-base font-light leading-relaxed text-[#6E6A64] max-lg:mx-auto sm:text-lg">
                   {home.heroSubtext}
                 </p>
               </div>
 
-              <div className="order-3 space-y-6 sm:space-y-7">
+              <div className="order-3 space-y-6 max-lg:flex max-lg:flex-col max-lg:items-center max-lg:text-center sm:space-y-7">
                 <div className="flex flex-col items-stretch gap-4 pt-2 sm:flex-row sm:items-center">
                   <Link
                     href="/shop"
@@ -174,10 +175,10 @@ export default function HomePage() {
                 {/* Small stitched courtesy line under the hero CTAs */}
                 <StitchRule
                   charm="none"
-                  className="max-w-[260px] text-[#7A1F3D]/30"
+                  className="max-w-[260px] text-[#7A1F3D]/30 max-lg:mx-auto"
                 />
 
-                <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#4A6B53]">
+                <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#4A6B53] max-lg:justify-center">
                   <Motif kind="pin" className="w-5 h-4 [&>span]:h-4 [&>span]:w-5 [&_svg]:h-4 [&_svg]:w-5" />
                   <span>Cut · Stitch · Finish — By Hand</span>
                 </p>
@@ -185,7 +186,7 @@ export default function HomePage() {
             </div>
 
             <div className="order-2 lg:order-2 lg:col-span-7">
-              <div className="mx-auto w-full max-w-[340px] bg-[linear-gradient(200deg,#7CA982,#7CA982)] p-5 sm:max-w-md sm:p-7 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0">
+              <div className="mx-auto w-full max-w-[330px] sm:max-w-md sm:bg-[linear-gradient(200deg,#7CA982,#7CA982)] sm:p-7 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0">
                 <div className="relative">
                   <div
                     aria-hidden="true"
@@ -200,13 +201,13 @@ export default function HomePage() {
                     aria-hidden="true"
                     className="absolute -right-3 -top-3 hidden h-8 w-8 border-r-2 border-t-2 border-[#C6A15B]/80 sm:block"
                   />
-                  <div className="relative aspect-[4/5] overflow-hidden bg-[#EFECE4] shadow-[0_28px_60px_rgba(122,31,61,0.2)] sm:aspect-[16/13] lg:aspect-[6/5]">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#EFECE4] shadow-[0_28px_60px_rgba(122,31,61,0.2)] max-sm:rounded-t-full max-sm:border-[5px] max-sm:border-[#7CA982] sm:aspect-[16/13] lg:aspect-[6/5]">
                     <img
                       src={home.heroImage}
                       alt="Reshma's Needle luxury fashion editorial portrait"
                       className="h-full w-full object-cover object-center"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 max-w-xs bg-wine-rich px-5 py-4 text-[#F8F5EF] sm:right-auto">
+                    <div className="absolute bottom-0 left-0 right-0 max-w-xs bg-wine-rich px-5 py-4 text-[#F8F5EF] max-sm:bottom-5 max-sm:left-1/2 max-sm:right-auto max-sm:w-[82%] max-sm:max-w-none max-sm:-translate-x-1/2 max-sm:text-center max-sm:shadow-[0_14px_34px_rgba(41,39,37,0.28)] sm:right-auto">
                       <p className="text-[10px] uppercase tracking-[0.22em] text-[#E8CE9C]">
                         {home.featuredLookLabel}
                       </p>
