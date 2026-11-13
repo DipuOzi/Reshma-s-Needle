@@ -311,10 +311,10 @@ export function Footer() {
                 if (lenis) lenis.scrollTo(0);
                 else window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="group/top inline-flex items-center gap-2 border border-[#292725]/15 px-4 py-2 text-[10px] uppercase tracking-[0.18em] text-[#4A4641] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#7A1F3D]/60 hover:text-[#7A1F3D]"
+              className="group/top inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap border border-[#292725]/15 px-4 py-2 text-[10px] uppercase tracking-[0.18em] text-[#4A4641] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#7A1F3D]/60 hover:text-[#7A1F3D]"
             >
-              <ArrowUp className="h-3.5 w-3.5 transition-transform duration-300 group-hover/top:-translate-y-0.5" />
-              Top
+              <ArrowUp className="h-3.5 w-3.5 shrink-0 transition-transform duration-300 group-hover/top:-translate-y-0.5" />
+              <span>Top</span>
             </button>
           </div>
         </div>

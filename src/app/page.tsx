@@ -500,12 +500,12 @@ export default function HomePage() {
           items={[
             {
               kind: "needle",
-              className: "absolute -left-10 bottom-0 hidden w-52 -rotate-[80deg] text-[#F8F5EF]/[0.09] lg:block",
+              className: "absolute -left-10 bottom-0 w-24 -rotate-[80deg] text-[#F8F5EF]/[0.09] lg:w-52",
               animation: "float-slow",
             },
             {
               kind: "needle",
-              className: "absolute -right-12 top-0 hidden w-52 rotate-[80deg] text-[#F8F5EF]/[0.09] lg:block",
+              className: "absolute -right-12 top-0 w-24 rotate-[80deg] text-[#F8F5EF]/[0.09] lg:w-52",
               animation: "float",
             },
             {

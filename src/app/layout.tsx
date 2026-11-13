@@ -44,7 +44,16 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col bg-[#F8F5EF] text-[#292725] antialiased selection:bg-[#7A1F3D] selection:text-[#F8F5EF]">
+      {/*
+        suppressHydrationWarning: browser extensions such as Grammarly inject
+        attributes (data-gr-ext-installed, data-new-gr-c-s-check-loaded) into
+        <body> before React hydrates, which would otherwise raise a false
+        hydration mismatch on this element only.
+      */}
+      <body
+        suppressHydrationWarning
+        className="min-h-screen flex flex-col bg-[#F8F5EF] text-[#292725] antialiased selection:bg-[#7A1F3D] selection:text-[#F8F5EF]"
+      >
         <SmoothScroll>
           <StoreProvider initialContent={content} initialSettings={settings}>
             <Navbar />

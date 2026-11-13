@@ -643,7 +643,7 @@ export function AdminDashboard() {
             },
             {
               id: "settings",
-              label: "6. WhatsApp, Delivery & Payment",
+              label: "6. Social, Contact, Delivery & Payment",
               icon: Settings,
             },
           ].map((tab) => {
@@ -1489,7 +1489,7 @@ export function AdminDashboard() {
           >
             <div className="border-b border-[#E5DEC9] pb-4">
               <h2 className="font-serif text-3xl text-[#292725]">
-                WhatsApp, Brand, Contact, Delivery &amp; Payment
+                Social Media, Contact, Delivery &amp; Payment
               </h2>
               <p className="text-xs text-[#6E6A64] mt-1">
                 Changes saved here update the live storefront, custom tailoring
@@ -1497,7 +1497,19 @@ export function AdminDashboard() {
               </p>
             </div>
 
-            {/* Hero & Brand Content */}
+            {/* Social Media & Contact */}
+            <div className="pt-2 border-t border-[#E5DEC9]">
+              <h3 className="text-xs uppercase tracking-[0.18em] text-[#7A1F3D] font-medium">
+                Social Media &amp; Contact
+              </h3>
+              <p className="text-[11px] text-[#6E6A64] mt-1 mb-5">
+                These links and details appear in the footer of every page, the
+                floating WhatsApp button, and the contact page. Leave a social
+                link empty to hide that icon from the footer.
+              </p>
+            </div>
+
+            {/* Brand & Contact fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1.5">
@@ -1610,7 +1622,12 @@ export function AdminDashboard() {
             </div>
 
             {/* Delivery Charges */}
-            <div className="pt-6 border-t border-[#E5DEC9] grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="pt-6 border-t border-[#E5DEC9]">
+              <h3 className="text-xs uppercase tracking-[0.18em] text-[#7A1F3D] font-medium">
+                Delivery Charges
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs uppercase tracking-wider text-[#292725] mb-1.5">
                   Delivery Charge — Inside Dhaka (৳)

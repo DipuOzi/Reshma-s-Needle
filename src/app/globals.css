@@ -278,6 +278,38 @@
   animation: rn-pulse 6s ease-in-out infinite;
 }
 
+/* Mobile menu mark: a champagne-gold dashed stitch that gently "sews"
+   back and forth, like thread running through cloth. */
+.rn-menu-stitch {
+  border-top: 2px dashed #c6a15b;
+  animation: rn-sew 3.4s ease-in-out infinite;
+}
+
+@keyframes rn-sew {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(4px);
+    opacity: 1;
+  }
+}
+
+/* Mobile drawer close cross: spins in with a grow, each time the drawer
+   opens. Applied via Tailwind arbitrary animation on the lucide icon. */
+@keyframes rn-cross-in {
+  from {
+    transform: rotate(-120deg) scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Reduced motion
 --------------------------------------------------------------------------- */
@@ -295,7 +327,8 @@
   .deco-float-slow,
   .deco-sway,
   .deco-spin,
-  .deco-pulse {
+  .deco-pulse,
+  .rn-menu-stitch {
     animation: none;
   }
 }
