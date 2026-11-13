@@ -98,6 +98,46 @@ export default function HomePage() {
         <AtelierBackdrop
           items={[
             {
+              kind: "pin",
+              className: "absolute right-3 top-8 hidden w-5 rotate-[24deg] text-[#7A1F3D]/25 max-lg:block",
+              animation: "float",
+            },
+            {
+              kind: "button",
+              className: "absolute left-2 top-14 hidden w-6 -rotate-12 text-[#4A6B53]/30 max-lg:block",
+              animation: "spin",
+            },
+            {
+              kind: "thimble",
+              className: "absolute left-4 top-[36%] hidden w-7 rotate-6 text-[#7A1F3D]/15 max-lg:block",
+              animation: "float-slow",
+            },
+            {
+              kind: "needle",
+              className: "absolute right-2 top-[44%] hidden w-10 rotate-[70deg] text-[#4A6B53]/25 max-lg:block",
+              animation: "sway",
+            },
+            {
+              kind: "button",
+              className: "absolute left-3 top-[56%] hidden w-7 rotate-6 text-[#7A1F3D]/15 max-lg:block",
+              animation: "float",
+            },
+            {
+              kind: "pin",
+              className: "absolute right-4 top-[68%] hidden w-6 -rotate-[20deg] text-[#7A1F3D]/20 max-lg:block",
+              animation: "float",
+            },
+            {
+              kind: "tape",
+              className: "absolute left-2 bottom-24 hidden w-24 -rotate-6 text-[#7A1F3D]/[0.08] max-lg:block",
+              animation: "float-slow",
+            },
+            {
+              kind: "spool",
+              className: "absolute right-2 bottom-10 hidden w-7 rotate-12 text-[#4A6B53]/25 max-lg:block",
+              animation: "float-slow",
+            },
+            {
               kind: "button",
               className: "absolute right-10 top-16 hidden w-16 rotate-12 text-[#4A6B53]/50 lg:block",
               animation: "spin",
