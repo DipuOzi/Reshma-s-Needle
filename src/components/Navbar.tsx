@@ -192,8 +192,8 @@ export function Navbar() {
                   widths swap on hover, plus a champagne-gold dashed stitch
                   that slowly sews back and forth (rn-menu-stitch). */}
               <span className="flex w-[22px] flex-col items-start gap-[4.5px] transition-transform duration-500 ease-out group-hover:rotate-0">
-                <span className="h-[1.8px] w-full rounded-full bg-[#292725] transition-all duration-500 ease-out group-hover:w-4" />
-                <span className="h-[1.8px] w-[70%] rounded-full bg-[#292725] transition-all duration-500 ease-out group-hover:w-full" />
+                <span className="h-[1.8px] w-full rounded-full bg-[#7A1F3D] transition-all duration-500 ease-out group-hover:w-4" />
+                <span className="h-[1.8px] w-[70%] rounded-full bg-[#7A1F3D] transition-all duration-500 ease-out group-hover:w-full" />
                 <span className="rn-menu-stitch mt-0.5 h-[3px] w-[85%] transition-all duration-500 group-hover:w-full" />
               </span>
             </button>
