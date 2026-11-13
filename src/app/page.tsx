@@ -389,6 +389,26 @@ export default function HomePage() {
         <AtelierBackdrop
           items={[
             {
+              kind: "pin",
+              className: "absolute right-4 top-10 hidden w-6 rotate-[24deg] text-[#E8CE9C]/30 max-lg:block",
+              animation: "float",
+            },
+            {
+              kind: "button",
+              className: "absolute left-3 top-[30%] hidden w-7 -rotate-12 text-[#F8F5EF]/20 max-lg:block",
+              animation: "spin",
+            },
+            {
+              kind: "needle",
+              className: "absolute right-2 bottom-[26%] hidden w-14 rotate-[75deg] text-[#E8CE9C]/20 max-lg:block",
+              animation: "sway",
+            },
+            {
+              kind: "thimble",
+              className: "absolute left-4 bottom-12 hidden w-7 rotate-6 text-[#F8F5EF]/20 max-lg:block",
+              animation: "float-slow",
+            },
+            {
               kind: "needle",
               className: "absolute -top-10 right-0 hidden w-64 rotate-[14deg] text-[#F8F5EF]/[0.08] xl:block",
               animation: "float-slow",
@@ -478,6 +498,26 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-ivory-rich py-20 lg:py-28">
         <AtelierBackdrop
           items={[
+            {
+              kind: "tape",
+              className: "absolute right-0 top-[36%] hidden w-28 rotate-3 text-[#7A1F3D]/[0.08] max-lg:block",
+              animation: "float-slow",
+            },
+            {
+              kind: "button",
+              className: "absolute left-1 top-[54%] hidden w-6 -rotate-12 text-[#4A6B53]/30 max-lg:block",
+              animation: "spin",
+            },
+            {
+              kind: "pin",
+              className: "absolute right-2 top-[72%] hidden w-5 -rotate-[20deg] text-[#7A1F3D]/20 max-lg:block",
+              animation: "float",
+            },
+            {
+              kind: "spool",
+              className: "absolute left-2 bottom-14 hidden w-7 rotate-12 text-[#4A6B53]/25 max-lg:block",
+              animation: "float-slow",
+            },
             {
               kind: "tape",
               className: "absolute right-0 top-16 hidden w-56 text-[#7A1F3D]/[0.09] xl:block",
