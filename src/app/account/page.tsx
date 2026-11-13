@@ -200,10 +200,9 @@ export default function CustomerAccountPage() {
             {/* Auth form panel */}
             <div className="relative p-7 sm:p-10">
               <div className="space-y-2 text-center">
-                <Motif
-                  kind="needle"
-                  className="mx-auto w-9 text-[#C6A15B]/60"
-                  animation="sway"
+                <StitchRule
+                  charm="scissors"
+                  className="mx-auto max-w-[200px] text-[#C6A15B]/70"
                 />
                 <p className="text-xs uppercase tracking-[0.2em] text-[#7A1F3D]">
                   {page.eyebrow}
@@ -351,21 +350,6 @@ export default function CustomerAccountPage() {
                     : "Create Account"}
                 </button>
               </form>
-
-              {authMode === "login" && (
-                <div className="mt-5 border-t border-[#E5DEC9] pt-4">
-                  <p className="border border-[#E5DEC9] bg-[#F8F5EF] px-4 py-3 text-center text-[11px] leading-relaxed text-[#6E6A64]">
-                    <span className="uppercase tracking-wider">
-                      Demo account:&nbsp;
-                    </span>
-                    <span className="font-mono text-[#292725]">
-                      samira@example.com
-                    </span>{" "}
-                    /{" "}
-                    <span className="font-mono text-[#292725]">reshma2026</span>
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -439,10 +423,9 @@ export default function CustomerAccountPage() {
           <div className="space-y-6">
             {orders.length === 0 ? (
               <div className="bg-white border border-[#E5DEC9] p-12 text-center space-y-4 shadow-[0_18px_40px_rgba(41,39,37,0.08)]">
-                <Motif
-                  kind="needle"
-                  className="mx-auto w-9 text-[#C6A15B]/60"
-                  animation="sway"
+                <StitchRule
+                  charm="scissors"
+                  className="mx-auto max-w-[200px] text-[#C6A15B]/70"
                 />
                 <p className="font-serif text-2xl text-[#292725]">
                   You have not placed any orders yet
