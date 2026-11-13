@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useStore, formatPrice } from "@/context/StoreContext";
+
+/** Slide-in duration for the drawer (ms). */
+const DRAWER_DURATION = 500;
 
 export function CartDrawer() {
   const {
@@ -16,7 +19,39 @@ export function CartDrawer() {
     settings,
   } = useStore();
 
-  if (!isCartDrawerOpen) return null;
+  // Keep the drawer mounted while it animates out, so closing is as smooth
+  // as opening: `shown` drives the classes, `mounted` controls existence.
+  const [mounted, setMounted] = useState(isCartDrawerOpen);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    if (isCartDrawerOpen) {
+      setMounted(true);
+      // Lock background scroll while the drawer is open — on mobile the page
+      // behind otherwise keeps moving (Lenis + touch) and the slide looks janky.
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      // Double rAF guarantees the closed position is painted first, so the
+      // browser actually transitions instead of jumping.
+      let inner = 0;
+      const outer = requestAnimationFrame(() => {
+        inner = requestAnimationFrame(() => setShown(true));
+      });
+      return () => {
+        document.body.style.overflow = previousOverflow;
+        cancelAnimationFrame(outer);
+        cancelAnimationFrame(inner);
+      };
+    }
+    setShown(false);
+    const timer = setTimeout(
+      () => setMounted(false),
+      DRAWER_DURATION
+    );
+    return () => clearTimeout(timer);
+  }, [isCartDrawerOpen]);
+
+  if (!mounted) return null;
 
   const estimatedDelivery =
     cart.length > 0 ? settings.deliveryChargeInside : 0;
@@ -24,11 +59,17 @@ export function CartDrawer() {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div
-        className="fixed inset-0 bg-[#292725]/45 backdrop-blur-xs transition-opacity"
+        className={`fixed inset-0 bg-[#292725]/45 sm:backdrop-blur-xs transition-opacity duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] motion-reduce:transition-none ${
+          shown ? "opacity-100" : "opacity-0"
+        }`}
         onClick={() => setIsCartDrawerOpen(false)}
       />
 
-      <div className="relative z-10 w-full max-w-md bg-[#F8F5EF] h-full flex flex-col justify-between border-l border-[#E5DEC9] shadow-2xl">
+      <div
+        className={`relative z-10 w-full max-w-md bg-[#F8F5EF] h-full flex flex-col justify-between border-l border-[#E5DEC9] shadow-2xl transform-gpu will-change-transform transition-transform duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] motion-reduce:transition-none ${
+          shown ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
         {/* Header */}
         <div className="relative px-6 py-5 flex items-center justify-between">
           <div>

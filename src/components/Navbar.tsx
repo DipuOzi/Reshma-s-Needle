@@ -3,7 +3,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingBag, User, Menu, X, Scissors } from "lucide-react";
+import { ShoppingBag, User, X, Scissors } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 import { useStore } from "@/context/StoreContext";
 
@@ -179,20 +179,35 @@ export function Navbar() {
         }`}
       >
         <div aria-hidden="true" className="gold-hairline pointer-events-none absolute bottom-0 left-0 h-px w-full opacity-50" />
-        <div className="mx-auto flex h-[96px] max-w-[1440px] items-center justify-between px-4 sm:px-8 lg:px-14">
+        <div className="relative mx-auto flex h-[96px] max-w-[1440px] items-center justify-between px-4 sm:px-8 lg:px-14">
           {/* Left: Mobile Menu Button + Brand Logo */}
           <div className="flex items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open navigation menu"
-              className="-ml-1.5 p-1.5 text-[#292725] transition-colors hover:text-[#7A1F3D] sm:-ml-2 sm:p-2 lg:hidden"
+              className="group -ml-1.5 flex h-11 w-11 items-center justify-center transition-transform duration-300 active:scale-90 sm:-ml-2 lg:hidden"
             >
-              <Menu className="w-5 h-5 stroke-[1.5]" />
+              {/* "The Seam" menu mark — three staggered thread lines whose
+                  widths swap on hover, plus a champagne-gold dashed stitch
+                  that slowly sews back and forth (rn-menu-stitch). */}
+              <span className="flex w-[22px] flex-col items-start gap-[4.5px] transition-transform duration-500 ease-out group-hover:rotate-0">
+                <span className="h-[1.8px] w-full rounded-full bg-[#292725] transition-all duration-500 ease-out group-hover:w-4" />
+                <span className="h-[1.8px] w-[70%] rounded-full bg-[#292725] transition-all duration-500 ease-out group-hover:w-full" />
+                <span className="rn-menu-stitch mt-0.5 h-[3px] w-[85%] transition-all duration-500 group-hover:w-full" />
+              </span>
             </button>
-            <div className="max-[359px]:[&_img]:h-16">
+            {/* Logo sits in the left slot on desktop; on mobile it is
+                absolutely centred instead (see below). */}
+            <div className="hidden lg:block max-[359px]:[&_img]:h-16">
               <BrandLogo size="md" />
             </div>
+          </div>
+
+          {/* Mobile-only: brand logo dead-centre of the header, independent
+              of the hamburger (left) and account/bag icons (right). */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:hidden [&_img]:h-[79px] max-[359px]:[&_img]:h-16">
+            <BrandLogo size="md" />
           </div>
 
           {/* Center: Main navigation with a sliding dark pill.
@@ -315,14 +330,22 @@ export function Navbar() {
         >
             <div>
               <div className="flex items-center justify-between pb-6 border-b border-[#E5DEC9]">
-                <BrandLogo size="sm" />
+                <div className="[&_img]:h-14">
+                  <BrandLogo size="sm" />
+                </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close navigation menu"
-                  className="p-2 text-[#292725] hover:text-[#7A1F3D]"
+                  className="p-2 text-[#292725] transition-all duration-300 hover:rotate-90 hover:scale-110 hover:text-[#7A1F3D]"
                 >
-                  <X className="w-5 h-5 stroke-[1.5]" />
+                  <X
+                    className={`w-5 h-5 stroke-[1.5] ${
+                      mobileMenuOpen
+                        ? "animate-[rn-cross-in_0.55s_cubic-bezier(0.22,1,0.36,1)_both]"
+                        : ""
+                    }`}
+                  />
                 </button>
               </div>
 

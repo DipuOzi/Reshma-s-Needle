@@ -27,7 +27,7 @@ export default async function AboutPage() {
           items={[
             {
               kind: "needle",
-              className: "absolute right-[40%] -top-10 hidden w-48 text-[#7A1F3D]/[0.10] lg:block",
+              className: "absolute right-[40%] -top-10 w-28 text-[#7A1F3D]/[0.10] lg:w-48",
               animation: "float-slow",
             },
             {
@@ -42,7 +42,7 @@ export default async function AboutPage() {
             },
             {
               kind: "tape",
-              className: "absolute right-6 top-6 hidden w-44 text-[#7A1F3D]/[0.09] xl:block",
+              className: "absolute right-6 top-6 w-24 text-[#7A1F3D]/[0.09] xl:w-44",
               animation: "float",
             },
           ]}
@@ -75,11 +75,11 @@ export default async function AboutPage() {
                   aria-hidden="true"
                   className="absolute -bottom-4 -right-4 hidden h-full w-full border border-[#C6A15B]/70 sm:block"
                 />
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#EFECE4] shadow-[0_28px_60px_rgba(122,31,61,0.18)]">
+                <div className="relative aspect-[4/5] max-sm:aspect-auto overflow-hidden bg-[#EFECE4] shadow-[0_28px_60px_rgba(122,31,61,0.18)]">
                   <img
                     src={about.image}
                     alt="Reshma's Needle tailoring studio craftsmanship"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full max-sm:h-auto object-cover"
                   />
                 </div>
                 {/* Small charm stitched to the frame */}

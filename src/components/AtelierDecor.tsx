@@ -186,10 +186,17 @@ export function Motif({ kind, className = "", style, animation = "none" }: Motif
   const Art = ART[kind];
   const animClass = animation !== "none" ? ANIMATION_CLASS[animation] ?? "" : "";
 
+  // Callers commonly hide/show motifs responsively ("hidden sm:block") or
+  // position them absolutely. Tailwind v4 sorts `.inline-block` after
+  // `.hidden` in the compiled CSS, so a hardcoded display utility here would
+  // silently override the caller's `hidden` and leak the motif onto mobile.
+  // Only apply the inline display when the caller does not control display.
+  const callerControlsDisplay = /\b(hidden|absolute)\b/.test(className);
+
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none inline-block select-none ${className}`}
+      className={`pointer-events-none select-none ${callerControlsDisplay ? "" : "inline-block"} ${className}`}
       style={style}
     >
       <span

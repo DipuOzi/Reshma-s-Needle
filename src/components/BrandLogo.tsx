@@ -26,7 +26,7 @@ export function BrandLogo({
       ? "h-28 w-auto"    // 112px tall — admin header
       : size === "2xl"
       ? "h-32 w-auto"    // 128px tall — footer brand
-      : "h-[84px] w-auto"; // 84px tall — desktop navbar
+      : "h-[84px] w-auto translate-y-[4px]"; // 84px tall — desktop navbar (nudged 4px down)
 
   const px =
     size === "sm" ? 48 : size === "lg" ? 96 : size === "xl" ? 112 : size === "2xl" ? 128 : 84;
