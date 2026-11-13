@@ -281,7 +281,7 @@
 /* Mobile menu mark: a champagne-gold dashed stitch that gently "sews"
    back and forth, like thread running through cloth. */
 .rn-menu-stitch {
-  border-top: 2px dashed #c6a15b;
+  border-top: 2px dashed #7CA982;
   animation: rn-sew 3.4s ease-in-out infinite;
 }
 
