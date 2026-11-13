@@ -37,5 +37,13 @@
     "storyEyebrow": "The Heart of Reshma's Needle",
     "storyQuote": "True luxury is not mass-produced. It is found in the quiet confidence of a garment cut exclusively for the woman who wears it.",
     "storyText": "Founded with a devotion to slow fashion and heirloom needlework, Reshma's Needle bridges the grace of fine handloom textiles with the intimacy of a personal tailoring studio. Whether you choose an unstitched three-piece fabric or commission a bespoke silhouette, every thread is inspected by hand."
+  },
+  "contact": {
+    "eyebrow": "Personal Consultation",
+    "title": "Contact The Atelier",
+    "intro": "Have a question about fabric drape, custom sizing, or bridal and festive orders? Reach out directly via WhatsApp or send an inquiry below.",
+    "image": "/images/product-ivory-zari.jpg",
+    "hours": "Saturday – Thursday: 9:00 AM – 7:00 PM",
+    "formTitle": "Send an Atelier Inquiry"
   }
 }
