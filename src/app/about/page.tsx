@@ -27,7 +27,7 @@ export default async function AboutPage() {
           items={[
             {
               kind: "needle",
-              className: "absolute right-[40%] -top-10 w-28 text-[#7A1F3D]/[0.10] lg:w-48",
+              className: "absolute left-1 -top-8 w-14 text-[#7A1F3D]/[0.10] lg:left-auto lg:right-[40%] lg:-top-10 lg:w-48",
               animation: "float-slow",
             },
             {
