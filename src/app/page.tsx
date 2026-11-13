@@ -201,7 +201,7 @@ export default function HomePage() {
                     aria-hidden="true"
                     className="absolute -right-3 -top-3 hidden h-8 w-8 border-r-2 border-t-2 border-[#C6A15B]/80 sm:block"
                   />
-                  <div className="relative aspect-[4/5] overflow-hidden bg-[#EFECE4] shadow-[0_28px_60px_rgba(122,31,61,0.2)] max-sm:rounded-t-full max-sm:border-[5px] max-sm:border-[#7CA982] sm:aspect-[16/13] lg:aspect-[6/5]">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#EFECE4] shadow-[0_28px_60px_rgba(122,31,61,0.2)] max-sm:rounded-t-full max-sm:border-[8px] max-sm:border-[#7CA982] sm:aspect-[16/13] lg:aspect-[6/5]">
                     <img
                       src={home.heroImage}
                       alt="Reshma's Needle luxury fashion editorial portrait"
