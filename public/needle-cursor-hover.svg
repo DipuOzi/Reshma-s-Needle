@@ -1,16 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
   <title>Reshma's Needle — tailor's needle cursor (clickable)</title>
+  <!-- Same needle; the gold eye is the only change, so clickable areas read
+       as a small highlight rather than a different cursor. -->
   <g stroke-linecap="round" stroke-linejoin="round">
-    <!-- Brighter thread and a small glint signal "this can be clicked". -->
-    <path d="M27.6 7.4 C34 8 35 17 29 21 C24.5 24 20.5 20 23 17" fill="none" stroke="#F8F5EF" stroke-width="4.2" />
-    <path d="M27.6 7.4 C34 8 35 17 29 21 C24.5 24 20.5 20 23 17" fill="none" stroke="#E8CE9C" stroke-width="2.6" />
-    <path d="M31.5 2.5 31.5 6.5 M29.5 4.5 33.5 4.5" fill="none" stroke="#E8CE9C" stroke-width="1.2" />
-
-    <path d="M3.2 32.8 22.8 8.4 27.6 13.2Z" fill="#F8F5EF" />
-    <path d="M3.2 32.8 23.5 9.4 26.9 12.8Z" fill="#292725" />
-    <path d="M4 32 23.8 9.4 26.6 12.2Z" fill="#7A1F3D" />
-    <path d="M6.2 29.8 24 10.8" fill="none" stroke="#E8CE9C" stroke-width="0.9" />
-
-    <ellipse cx="27" cy="9" rx="3.1" ry="1.8" transform="rotate(-45 27 9)" fill="#F8F5EF" stroke="#292725" stroke-width="1.4" />
+    <path d="M4 32 28.2 8.7" fill="none" stroke="#5E8A66" stroke-width="3.6" />
+    <path d="M4 32 28.2 8.7" fill="none" stroke="#7CA982" stroke-width="2.4" />
+    <ellipse cx="26.4" cy="10.5" rx="2.4" ry="1" transform="rotate(-45 26.4 10.5)" fill="#E8CE9C" stroke="#5E8A66" stroke-width="0.8" />
   </g>
 </svg>
