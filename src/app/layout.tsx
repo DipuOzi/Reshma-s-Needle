@@ -20,6 +20,7 @@ import { QuickViewModal } from "@/components/QuickViewModal";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { ImageFallback } from "@/components/ImageFallback";
+import { NeedleCursor } from "@/components/NeedleCursor";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { getSiteContent, getStoreSettings } from "@/lib/serverData";
 
@@ -72,6 +73,7 @@ export default async function RootLayout({
             <ImageFallback />
           </StoreProvider>
         </SmoothScroll>
+        <NeedleCursor />
       </body>
     </html>
   );

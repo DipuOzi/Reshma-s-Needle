@@ -414,3 +414,28 @@
     cursor: text;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Animated needle + thread cursor
+
+   `NeedleCursor` adds .rn-cursor-active to <html> only on fine pointers with
+   motion allowed. While it is on, the native cursor is hidden and the SVG
+   needle takes over; the rules above stay as the fallback for every other
+   case (touch, reduced motion, JavaScript disabled).
+--------------------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  html.rn-cursor-active,
+  html.rn-cursor-active * {
+    cursor: none !important;
+  }
+
+  /* Typing needs the real I-beam, so text fields keep it (the animated
+     needle hides itself while one of these is hovered). */
+  html.rn-cursor-active
+    :is(
+      input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="color"]):not([type="range"]),
+      textarea
+    ) {
+    cursor: text !important;
+  }
+}
