@@ -32,11 +32,7 @@ export const metadata: Metadata = {
   description:
     "Elegance, Made Personal. Thoughtfully designed women's clothing and bespoke custom tailoring crafted to your exact measurements.",
   icons: {
-    icon: [
-      { url: "/favicon.webp", type: "image/webp", sizes: "any" },
-      { url: "/favicon.svg?v=5", type: "image/svg+xml", sizes: "any" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
+    icon: "/favicon.webp",
   },
 };
 
