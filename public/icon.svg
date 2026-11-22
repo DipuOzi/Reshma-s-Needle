@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <title>Reshma's Needle</title>
   <rect width="64" height="64" rx="14" fill="#F8F5EF" />
-  <!-- The logo's own needle and thread mark: sage needle, wine thread. -->
-  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M13 51 45 15" stroke="#5E8A66" stroke-width="7.6" />
-    <path d="M13 51 45 15" stroke="#7CA982" stroke-width="5.8" />
-    <path d="M44 10.5 C56.5 8.5 61 22 51.5 27 C44.5 30.5 39 23.5 44.5 19.5" stroke="#7A1F3D" stroke-width="3.6" />
-  </g>
-  <ellipse cx="42.6" cy="17.4" rx="3.5" ry="1.7" transform="rotate(-45 42.6 17.4)" fill="#F8F5EF" stroke="#5E8A66" stroke-width="1.2" />
+  <!-- RN initials — Cormorant Garamond, same typography as the logo -->
+  <text x="32" y="48" text-anchor="middle" dominant-baseline="middle" font-family="Cormorant Garamond, serif" font-weight="600" font-size="26" fill="#292725" letter-spacing="-0.02em">RN</text>
+  <!-- Needle mark from the logo — sage shaft #7CA982 -->
+  <path d="M46 14 58 6" stroke="#7CA982" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- Thread mark from the logo — wine thread #7A1F3D -->
+  <path d="M45 10 C53 8 57 16 50 20 C46 22 42 15 45 11" stroke="#7A1F3D" stroke-width="2.4" stroke-linecap="round" fill="none"/>
 </svg>
