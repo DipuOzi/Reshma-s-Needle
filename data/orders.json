@@ -107,5 +107,39 @@
     "total": 6030,
     "status": "Cancelled",
     "createdAt": "2026-11-11T04:32:30.128Z"
+  },
+  {
+    "id": 4,
+    "orderNumber": "RN-2026-708509",
+    "customerId": 1,
+    "customerName": "Samira Chowdhury",
+    "customerEmail": "samira@example.com",
+    "phone": "01712345678",
+    "whatsapp": "8801712345678",
+    "deliveryAddress": "Apartment 4B, House 22, Road 11, Banani, Dhaka 1213",
+    "deliveryZone": "Inside Dhaka",
+    "orderNotes": null,
+    "paymentMethod": "Cash on Delivery",
+    "paymentTransactionId": null,
+    "items": [
+      {
+        "productId": 2,
+        "slug": "niloufer-sage-organza-three-piece",
+        "name": "Niloufer Soft Sage Silk-Organza Three Piece",
+        "category": "Three Piece",
+        "image": "/images/collection-three-piece.jpg",
+        "unitPrice": 8400,
+        "quantity": 1,
+        "purchaseMode": "Unstitched",
+        "selectedColor": "Warm Ivory",
+        "selectedSize": "Unstitched (Full 3-Piece Fabric)",
+        "cartItemId": "2-Unstitched-Warm Ivory-Unstitched (Full 3-Piece Fabric)"
+      }
+    ],
+    "subtotal": 8400,
+    "deliveryCharge": 80,
+    "total": 8480,
+    "status": "Pending",
+    "createdAt": "2026-11-22T20:35:08.509Z"
   }
 ]
