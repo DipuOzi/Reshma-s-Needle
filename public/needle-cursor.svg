@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
   <title>Reshma's Needle — tailor's needle cursor</title>
-  <!-- One slim needle, logo sage with a darker edge for contrast.
-       The point at (4, 32) is the CSS hotspot. -->
-  <g stroke-linecap="round" stroke-linejoin="round">
-    <path d="M4 32 28.2 8.7" fill="none" stroke="#5E8A66" stroke-width="3.6" />
-    <path d="M4 32 28.2 8.7" fill="none" stroke="#7CA982" stroke-width="2.4" />
-    <ellipse cx="26.4" cy="10.5" rx="2.4" ry="1" transform="rotate(-45 26.4 10.5)" fill="#F8F5EF" stroke="#5E8A66" stroke-width="0.8" />
+  <!-- Plain tailor's needle: thin sage shaft, round eye, point at (4, 32)
+       which is the CSS hotspot. -->
+  <g fill="none" stroke="#7CA982" stroke-linecap="round">
+    <path d="M4.6 31.4 20.6 11.8" stroke-width="1.9" />
+    <circle cx="23.2" cy="9.2" r="2.9" stroke-width="1.9" />
   </g>
 </svg>

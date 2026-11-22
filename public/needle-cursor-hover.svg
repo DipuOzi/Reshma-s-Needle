@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
   <title>Reshma's Needle — tailor's needle cursor (clickable)</title>
-  <!-- Same needle; the gold eye is the only change, so clickable areas read
-       as a small highlight rather than a different cursor. -->
-  <g stroke-linecap="round" stroke-linejoin="round">
-    <path d="M4 32 28.2 8.7" fill="none" stroke="#5E8A66" stroke-width="3.6" />
-    <path d="M4 32 28.2 8.7" fill="none" stroke="#7CA982" stroke-width="2.4" />
-    <ellipse cx="26.4" cy="10.5" rx="2.4" ry="1" transform="rotate(-45 26.4 10.5)" fill="#E8CE9C" stroke="#5E8A66" stroke-width="0.8" />
+  <!-- Same needle, drawn a touch bolder so clickable areas still read as
+       active without changing the cursor's colour or shape. -->
+  <g fill="none" stroke="#7CA982" stroke-linecap="round">
+    <path d="M4.6 31.4 20.6 11.8" stroke-width="2.3" />
+    <circle cx="23.2" cy="9.2" r="2.9" stroke-width="2.3" />
   </g>
 </svg>
