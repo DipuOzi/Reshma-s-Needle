@@ -13,15 +13,21 @@ import { useEffect, useRef } from "react";
  * The needle is always sage. The thread is wine, with a champagne-gold copy of
  * the same curve painted on top through a mask that follows the surfaces the
  * thread is lying on: only the part of the thread inside a dark section turns
- * gold, and the crossing fades softly instead of switching on a pixel edge.
+ * gold. The mask is cut into sub-pixel slices whose opacity ramps between the
+ * rope points, so the crossing is a continuous gradient with no visible step.
  * Any element can pin the choice with data-cursor-theme.
  *
  * Only active for fine pointers, and disabled for reduced-motion users — those
  * keep the plain needle cursor defined in globals.css.
  */
 
-const SEGMENTS = 12; // thread pieces after the eye
-const SEGMENT_LENGTH = 5.5; // px between points
+// The rope keeps ~3px points; the mask is cut finer than that (see
+// SLICES_PER_SEGMENT) and its opacity is interpolated between points, so the
+// wine/gold hand-over is a continuous ramp with no visible steps.
+const SEGMENTS = 20; // rope points after the eye
+const SLICES_PER_SEGMENT = 4; // mask pieces per rope segment (~0.8px each)
+const MASK_SLICES = SEGMENTS * SLICES_PER_SEGMENT;
+const SEGMENT_LENGTH = 3.3; // px between points
 const DAMPING = 0.9;
 const GRAVITY = 1500; // px/s², keeps the thread hanging naturally
 const CONSTRAINT_PASSES = 3;
@@ -32,6 +38,13 @@ const OPAQUE_COVERAGE = 0.6; // less solid than this and the page shows through
 const SAMPLE_INTERVAL_MS = 90; // how often surfaces under the thread are read
 const SAMPLE_SHIFT_PX = 8; // …or sooner if a point has moved this far
 const COLOUR_EASING = 0.35; // per frame; quick, but not a hard switch
+const RAMP_PASSES = 3; // spreads the colour boundary over ~10px of thread
+// The mask pieces have to be well wider than the thread: the blur eats into the
+// stroke edge, and a 4px piece would top out around 75% opacity, leaving the
+// gold looks washed out instead of champagne.
+const MASK_WIDTH = 8; // mask stroke width; the thread itself is 1.6px
+const MASK_BLUR = 1.3; // feathers the colour change so it never shows a seam
+const FILTER_PADDING = 12; // room around the thread for the blur, in px
 
 type Point = { x: number; y: number; px: number; py: number };
 type Theme = "light" | "dark";
@@ -64,15 +77,39 @@ function smoothPath(points: Point[]): string {
   return d;
 }
 
-function segmentPath(points: Point[], index: number): string {
-  const p1 = points[index];
-  const p2 = points[index + 1];
-  const { c1x, c1y, c2x, c2y } = controlPoints(points, index);
+/** A cubic curve as [x0, y0, c1x, c1y, c2x, c2y, x1, y1]. */
+type Cubic = [number, number, number, number, number, number, number, number];
+
+const midpoint = (a: number, b: number) => (a + b) / 2;
+
+/** de Casteljau split into two halves, so a segment can be cut into slices. */
+function halveCubic(cubic: Cubic): [Cubic, Cubic] {
+  const [x0, y0, c1x, c1y, c2x, c2y, x1, y1] = cubic;
+  const ax = midpoint(x0, c1x);
+  const ay = midpoint(y0, c1y);
+  const bx = midpoint(c1x, c2x);
+  const by = midpoint(c1y, c2y);
+  const dx = midpoint(c2x, x1);
+  const dy = midpoint(c2y, y1);
+  const ex = midpoint(ax, bx);
+  const ey = midpoint(ay, by);
+  const fx = midpoint(bx, dx);
+  const fy = midpoint(by, dy);
+  const mx = midpoint(ex, fx);
+  const my = midpoint(ey, fy);
+  return [
+    [x0, y0, ax, ay, ex, ey, mx, my],
+    [mx, my, fx, fy, dx, dy, x1, y1],
+  ];
+}
+
+function cubicPath(cubic: Cubic): string {
+  const [x0, y0, c1x, c1y, c2x, c2y, x1, y1] = cubic;
   return (
-    `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}` +
+    `M ${x0.toFixed(2)} ${y0.toFixed(2)}` +
     ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}` +
     ` ${c2x.toFixed(2)} ${c2y.toFixed(2)}` +
-    ` ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`
+    ` ${x1.toFixed(2)} ${y1.toFixed(2)}`
   );
 }
 
@@ -173,6 +210,7 @@ export function NeedleCursor() {
   const threadGoldRef = useRef<SVGPathElement>(null);
   const maskSegmentRefs = useRef<(SVGPathElement | null)[]>([]);
   const fadeGradientRef = useRef<SVGLinearGradientElement>(null);
+  const blurFilterRef = useRef<SVGFilterElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -181,12 +219,14 @@ export function NeedleCursor() {
     const threadGold = threadGoldRef.current;
     const maskSegments = maskSegmentRefs.current;
     const fadeGradient = fadeGradientRef.current;
+    const blurFilter = blurFilterRef.current;
     if (
       !root ||
       !needle ||
       !threadWine ||
       !threadGold ||
       !fadeGradient ||
+      !blurFilter ||
       maskSegments.some((segment) => !segment)
     ) {
       return;
@@ -222,7 +262,8 @@ export function NeedleCursor() {
     const sampledAt = new Float64Array(SEGMENTS + 1);
     const sampledX = new Float64Array(SEGMENTS + 1).fill(Number.NaN);
     const sampledY = new Float64Array(SEGMENTS + 1).fill(Number.NaN);
-    const segmentAlpha = new Float32Array(SEGMENTS);
+    const pointAlpha = new Float32Array(SEGMENTS + 1);
+    const smoothed = new Float32Array(SEGMENTS + 1);
     const themeCache = new WeakMap<Element, Theme>();
 
     const setOpacity = (visible: boolean) => {
@@ -402,17 +443,78 @@ export function NeedleCursor() {
       threadWine.setAttribute("d", path);
       threadGold.setAttribute("d", path);
 
+      // The blur region has to follow the thread explicitly — the mask group is
+      // stroke-only, so its bounding box has no width to derive a region from.
+      let minX = points[0].x;
+      let minY = points[0].y;
+      let maxX = minX;
+      let maxY = minY;
+      for (const p of points) {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+      }
+      blurFilter.setAttribute("x", (minX - FILTER_PADDING).toFixed(1));
+      blurFilter.setAttribute("y", (minY - FILTER_PADDING).toFixed(1));
+      blurFilter.setAttribute(
+        "width",
+        (maxX - minX + FILTER_PADDING * 2).toFixed(1)
+      );
+      blurFilter.setAttribute(
+        "height",
+        (maxY - minY + FILTER_PADDING * 2).toFixed(1)
+      );
+
       // The gold overlay follows the same curve, revealed only where the
       // thread lies on a dark surface. Soft overlapping mask pieces keep the
       // hand-over a gradient rather than a visible cut.
+      for (let i = 0; i < points.length; i++) {
+        const target = surface[i] === "dark" ? 1 : 0;
+        pointAlpha[i] += (target - pointAlpha[i]) * COLOUR_EASING;
+        smoothed[i] = pointAlpha[i];
+      }
+
+      // Blur the per-point colour along the thread so the change is a gradient
+      // over a few pixels instead of a step at the section edge.
+      for (let pass = 0; pass < RAMP_PASSES; pass++) {
+        for (let i = 1; i < smoothed.length - 1; i++) {
+          smoothed[i] =
+            (smoothed[i - 1] + smoothed[i] * 2 + smoothed[i + 1]) / 4;
+        }
+      }
+
       for (let i = 0; i < SEGMENTS; i++) {
-        const segment = maskSegments[i];
-        if (!segment) continue;
-        const target =
-          (surface[i] === "dark" ? 0.5 : 0) + (surface[i + 1] === "dark" ? 0.5 : 0);
-        segmentAlpha[i] += (target - segmentAlpha[i]) * COLOUR_EASING;
-        segment.setAttribute("d", segmentPath(points, i));
-        segment.setAttribute("stroke-opacity", segmentAlpha[i].toFixed(3));
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const { c1x, c1y, c2x, c2y } = controlPoints(points, i);
+        const [first, second] = halveCubic([
+          p1.x,
+          p1.y,
+          c1x,
+          c1y,
+          c2x,
+          c2y,
+          p2.x,
+          p2.y,
+        ]);
+        const [quarterOne, quarterTwo] = halveCubic(first);
+        const [quarterThree, quarterFour] = halveCubic(second);
+        const slices = [quarterOne, quarterTwo, quarterThree, quarterFour];
+        const from = smoothed[i];
+        const delta = smoothed[i + 1] - from;
+
+        for (let q = 0; q < slices.length; q++) {
+          const slice = maskSegments[i * slices.length + q];
+          if (!slice) continue;
+          slice.setAttribute("d", cubicPath(slices[q]));
+          // Opacity is a linear ramp inside the segment, so the pieces butt
+          // together into one continuous gradient instead of stepping.
+          slice.setAttribute(
+            "stroke-opacity",
+            (from + (delta * (q + 0.5)) / slices.length).toFixed(3)
+          );
+        }
       }
 
       const tail = points[points.length - 1];
@@ -485,6 +587,25 @@ export function NeedleCursor() {
           />
         </mask>
 
+        {/*
+          Feathered so the colour hand-over has no visible edge. The region has
+          to be given in user space: the filtered group only contains strokes,
+          so its object bounding box is zero-width and a percentage region would
+          clip the whole blur (and the gold thread) away.
+        */}
+        <filter
+          ref={blurFilterRef}
+          id="rn-thread-soft"
+          filterUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="0"
+          height="0"
+          colorInterpolationFilters="sRGB"
+        >
+          <feGaussianBlur stdDeviation={MASK_BLUR} />
+        </filter>
+
         {/* Reveals the gold copy of the thread only over dark surfaces. */}
         <mask
           id="rn-thread-gold-mask"
@@ -495,19 +616,21 @@ export function NeedleCursor() {
           height="40000"
         >
           <rect x="-20000" y="-20000" width="40000" height="40000" fill="#000" />
-          {Array.from({ length: SEGMENTS }, (_, index) => (
-            <path
-              key={index}
-              ref={(element) => {
-                maskSegmentRefs.current[index] = element;
-              }}
-              fill="none"
-              stroke="#fff"
-              strokeWidth="5.5"
-              strokeLinecap="round"
-              strokeOpacity="0"
-            />
-          ))}
+          <g filter="url(#rn-thread-soft)">
+            {Array.from({ length: MASK_SLICES }, (_, index) => (
+              <path
+                key={index}
+                ref={(element) => {
+                  maskSegmentRefs.current[index] = element;
+                }}
+                fill="none"
+                stroke="#fff"
+                strokeWidth={MASK_WIDTH}
+                strokeLinecap="butt"
+                strokeOpacity="0"
+              />
+            ))}
+          </g>
         </mask>
       </defs>
 
