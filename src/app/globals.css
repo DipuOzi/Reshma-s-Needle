@@ -443,10 +443,6 @@
   stroke: #5e8a66;
 }
 
-[data-rn-cursor] > path {
-  /* Colour comes from the component, per segment. */
-  transition: stroke 120ms linear;
-}
 @media (hover: hover) and (pointer: fine) {
   html.rn-cursor-active,
   html.rn-cursor-active * {

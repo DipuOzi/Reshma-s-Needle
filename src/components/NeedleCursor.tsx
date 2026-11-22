@@ -6,15 +6,15 @@ import { useEffect, useRef } from "react";
  * Animated tailor's needle cursor.
  *
  * The logo's needle (sage shaft, round eye) is drawn with its point exactly on
- * the pointer, and a thread runs out of the eye. The thread is a short rope
- * simulated with Verlet integration, so it trails behind the needle and
+ * the pointer, and a thread runs out of the eye. The thread is one smooth
+ * curve driven by a short Verlet rope, so it trails behind the needle and
  * swings/settles on its own when the pointer moves.
  *
- * The needle is always sage, but the thread is coloured segment by segment from
- * the surface each piece of thread is actually over: wine over light areas,
- * champagne gold over dark ones. Dropping into a dark section therefore paints
- * only the part of the thread that is inside it. Any element can pin the choice
- * with data-cursor-theme.
+ * The needle is always sage. The thread is wine, with a champagne-gold copy of
+ * the same curve painted on top through a mask that follows the surfaces the
+ * thread is lying on: only the part of the thread inside a dark section turns
+ * gold, and the crossing fades softly instead of switching on a pixel edge.
+ * Any element can pin the choice with data-cursor-theme.
  *
  * Only active for fine pointers, and disabled for reduced-motion users — those
  * keep the plain needle cursor defined in globals.css.
@@ -29,24 +29,45 @@ const EYE_LOCAL = { x: 24.4, y: 24.4 }; // eye position in needle space
 const MAX_TILT = 12; // degrees the needle leans into the movement
 const DARK_LUMINANCE = 0.3; // below this the surface needs the light thread
 const OPAQUE_COVERAGE = 0.6; // less solid than this and the page shows through
-const THREAD_WINE = [122, 31, 61] as const;
-const THREAD_GOLD = [232, 206, 156] as const;
 const SAMPLE_INTERVAL_MS = 90; // how often surfaces under the thread are read
 const SAMPLE_SHIFT_PX = 8; // …or sooner if a point has moved this far
-const COLOUR_EASING = 0.2; // per frame, keeps the switch from snapping
+const COLOUR_EASING = 0.35; // per frame; quick, but not a hard switch
 
 type Point = { x: number; y: number; px: number; py: number };
 type Theme = "light" | "dark";
 
-function catmullRomSegment(points: Point[], index: number): string {
+/** Control points for the smooth cubic through `points`. */
+function controlPoints(points: Point[], index: number) {
   const p0 = points[index - 1] ?? points[index];
   const p1 = points[index];
   const p2 = points[index + 1];
   const p3 = points[index + 2] ?? p2;
-  const c1x = p1.x + (p2.x - p0.x) / 6;
-  const c1y = p1.y + (p2.y - p0.y) / 6;
-  const c2x = p2.x - (p3.x - p1.x) / 6;
-  const c2y = p2.y - (p3.y - p1.y) / 6;
+  return {
+    c1x: p1.x + (p2.x - p0.x) / 6,
+    c1y: p1.y + (p2.y - p0.y) / 6,
+    c2x: p2.x - (p3.x - p1.x) / 6,
+    c2y: p2.y - (p3.y - p1.y) / 6,
+  };
+}
+
+function smoothPath(points: Point[]): string {
+  if (points.length < 2) return "";
+  let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const { c1x, c1y, c2x, c2y } = controlPoints(points, i);
+    const p2 = points[i + 1];
+    d +=
+      ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}` +
+      ` ${c2x.toFixed(2)} ${c2y.toFixed(2)}` +
+      ` ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+  return d;
+}
+
+function segmentPath(points: Point[], index: number): string {
+  const p1 = points[index];
+  const p2 = points[index + 1];
+  const { c1x, c1y, c2x, c2y } = controlPoints(points, index);
   return (
     `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}` +
     ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}` +
@@ -66,15 +87,6 @@ function relativeLuminance(r: number, g: number, b: number): number {
     0.7152 * channelLuminance(g) +
     0.0722 * channelLuminance(b)
   );
-}
-
-function mixThreadColor(factor: number): string {
-  const t = factor < 0 ? 0 : factor > 1 ? 1 : factor;
-  const channel = (from: number, to: number) => Math.round(from + (to - from) * t);
-  return `rgb(${channel(THREAD_WINE[0], THREAD_GOLD[0])}, ${channel(
-    THREAD_WINE[1],
-    THREAD_GOLD[1]
-  )}, ${channel(THREAD_WINE[2], THREAD_GOLD[2])})`;
 }
 
 /** Parses a computed colour, returning null for fully transparent values. */
@@ -157,13 +169,28 @@ function sampleImage(
 export function NeedleCursor() {
   const rootRef = useRef<SVGSVGElement>(null);
   const needleRef = useRef<SVGGElement>(null);
-  const segmentRefs = useRef<(SVGPathElement | null)[]>([]);
+  const threadWineRef = useRef<SVGPathElement>(null);
+  const threadGoldRef = useRef<SVGPathElement>(null);
+  const maskSegmentRefs = useRef<(SVGPathElement | null)[]>([]);
+  const fadeGradientRef = useRef<SVGLinearGradientElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     const needle = needleRef.current;
-    const segments = segmentRefs.current;
-    if (!root || !needle || segments.some((segment) => !segment)) return;
+    const threadWine = threadWineRef.current;
+    const threadGold = threadGoldRef.current;
+    const maskSegments = maskSegmentRefs.current;
+    const fadeGradient = fadeGradientRef.current;
+    if (
+      !root ||
+      !needle ||
+      !threadWine ||
+      !threadGold ||
+      !fadeGradient ||
+      maskSegments.some((segment) => !segment)
+    ) {
+      return;
+    }
 
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -195,7 +222,7 @@ export function NeedleCursor() {
     const sampledAt = new Float64Array(SEGMENTS + 1);
     const sampledX = new Float64Array(SEGMENTS + 1).fill(Number.NaN);
     const sampledY = new Float64Array(SEGMENTS + 1).fill(Number.NaN);
-    const segmentFactor = new Float32Array(SEGMENTS).fill(0);
+    const segmentAlpha = new Float32Array(SEGMENTS);
     const themeCache = new WeakMap<Element, Theme>();
 
     const setOpacity = (visible: boolean) => {
@@ -370,25 +397,29 @@ export function NeedleCursor() {
         `translate(${mouseX.toFixed(2)} ${mouseY.toFixed(2)}) rotate(${tilt.toFixed(2)})`
       );
 
-      for (let i = 0; i < SEGMENTS; i++) {
-        const path = catmullRomSegment(points, i);
-        const segment = segments[i];
-        if (!segment) continue;
+      // One smooth curve for the thread itself.
+      const path = smoothPath(points);
+      threadWine.setAttribute("d", path);
+      threadGold.setAttribute("d", path);
 
-        // Each piece of thread takes the average of the surface at its ends,
-        // eased so a crossing fades instead of switching on a pixel boundary.
+      // The gold overlay follows the same curve, revealed only where the
+      // thread lies on a dark surface. Soft overlapping mask pieces keep the
+      // hand-over a gradient rather than a visible cut.
+      for (let i = 0; i < SEGMENTS; i++) {
+        const segment = maskSegments[i];
+        if (!segment) continue;
         const target =
           (surface[i] === "dark" ? 0.5 : 0) + (surface[i + 1] === "dark" ? 0.5 : 0);
-        segmentFactor[i] += (target - segmentFactor[i]) * COLOUR_EASING;
-        const factor = segmentFactor[i];
-
-        segment.setAttribute("d", path);
-        segment.setAttribute("stroke", mixThreadColor(factor));
-        segment.setAttribute(
-          "stroke-opacity",
-          (0.95 - (i / (SEGMENTS - 1)) * 0.7).toFixed(2)
-        );
+        segmentAlpha[i] += (target - segmentAlpha[i]) * COLOUR_EASING;
+        segment.setAttribute("d", segmentPath(points, i));
+        segment.setAttribute("stroke-opacity", segmentAlpha[i].toFixed(3));
       }
+
+      const tail = points[points.length - 1];
+      fadeGradient.setAttribute("x1", eyeX.toFixed(2));
+      fadeGradient.setAttribute("y1", eyeY.toFixed(2));
+      fadeGradient.setAttribute("x2", tail.x.toFixed(2));
+      fadeGradient.setAttribute("y2", tail.y.toFixed(2));
 
       raf = requestAnimationFrame(frame);
     };
@@ -421,21 +452,84 @@ export function NeedleCursor() {
       data-rn-cursor=""
       className="pointer-events-none fixed inset-0 z-[200] h-full w-full opacity-0 transition-opacity duration-150"
     >
-      {/* Thread: one short curve per segment so each piece can carry the colour
-          of the surface it is lying on. */}
-      {Array.from({ length: SEGMENTS }, (_, index) => (
+      <defs>
+        {/* Fades the thread towards its tail. */}
+        <linearGradient
+          ref={fadeGradientRef}
+          id="rn-thread-fade"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="0"
+        >
+          <stop offset="0%" stopColor="#fff" stopOpacity="1" />
+          <stop offset="55%" stopColor="#fff" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0.35" />
+        </linearGradient>
+        <mask
+          id="rn-thread-fade-mask"
+          maskUnits="userSpaceOnUse"
+          x="-20000"
+          y="-20000"
+          width="40000"
+          height="40000"
+        >
+          <rect x="-20000" y="-20000" width="40000" height="40000" fill="#000" />
+          <rect
+            x="-20000"
+            y="-20000"
+            width="40000"
+            height="40000"
+            fill="url(#rn-thread-fade)"
+          />
+        </mask>
+
+        {/* Reveals the gold copy of the thread only over dark surfaces. */}
+        <mask
+          id="rn-thread-gold-mask"
+          maskUnits="userSpaceOnUse"
+          x="-20000"
+          y="-20000"
+          width="40000"
+          height="40000"
+        >
+          <rect x="-20000" y="-20000" width="40000" height="40000" fill="#000" />
+          {Array.from({ length: SEGMENTS }, (_, index) => (
+            <path
+              key={index}
+              ref={(element) => {
+                maskSegmentRefs.current[index] = element;
+              }}
+              fill="none"
+              stroke="#fff"
+              strokeWidth="5.5"
+              strokeLinecap="round"
+              strokeOpacity="0"
+            />
+          ))}
+        </mask>
+      </defs>
+
+      <g mask="url(#rn-thread-fade-mask)">
         <path
-          key={index}
-          ref={(element) => {
-            segmentRefs.current[index] = element;
-          }}
+          ref={threadWineRef}
           fill="none"
-          stroke="rgb(122, 31, 61)"
+          stroke="#7a1f3d"
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-      ))}
+        <path
+          ref={threadGoldRef}
+          fill="none"
+          stroke="#e8ce9c"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          mask="url(#rn-thread-gold-mask)"
+        />
+      </g>
 
       {/* Needle: point at the local origin, eye down and to the right. */}
       <g ref={needleRef}>
