@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   title: "Reshma's Needle | Luxury Women's Boutique & Custom Tailoring Atelier",
   description:
     "Elegance, Made Personal. Thoughtfully designed women's clothing and bespoke custom tailoring crafted to your exact measurements.",
-;
+};
 
 export default async function RootLayout({
   children,
