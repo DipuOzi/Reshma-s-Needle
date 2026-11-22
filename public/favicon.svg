@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <title>Reshma's Needle Favicon</title>
-  <rect width="64" height="64" rx="8" fill="#292725"/>
-  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="32" fill="#F8F5EF">RN</text>
+  <!-- Brand cream background, matching the site and the logo -->
+  <rect width="64" height="64" rx="14" fill="#F8F5EF"/>
+  <!-- Needle mark from the logo — sage shaft #7CA982 -->
+  <path d="M46 14 58 6" stroke="#7CA982" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- Thread mark from the logo — wine thread #7A1F3D -->
+  <path d="M45 10 C53 8 57 16 50 20 C46 22 42 15 45 11" stroke="#7A1F3D" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+  <!-- RN initials — Cormorant Garamond, same typography as the logo -->
+  <text x="32" y="48" text-anchor="middle" dominant-baseline="middle" font-family="Cormorant Garamond, serif" font-weight="600" font-size="26" fill="#292725" letter-spacing="-0.02em">RN</text>
 </svg>
