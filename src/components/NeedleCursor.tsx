@@ -10,9 +10,9 @@ import { useEffect, useRef } from "react";
  * rope simulated with Verlet integration, so it trails behind the needle and
  * swings/settles on its own when the pointer moves.
  *
- * The needle and thread also re-colour themselves for the surface underneath:
- * on dark sections (charcoal, wine, photos) the thread turns champagne gold so
- * it stays visible. Any element can pin the choice with data-cursor-theme.
+ * The needle stays sage everywhere, but the thread cross-fades to champagne
+ * gold on dark surfaces (charcoal, wine, photos) so it never disappears into
+ * the background. Any element can pin the choice with data-cursor-theme.
  *
  * Only active for fine pointers, and disabled for reduced-motion users — those
  * keep the plain needle cursor defined in globals.css.
@@ -145,15 +145,17 @@ function sampleImage(
 export function NeedleCursor() {
   const rootRef = useRef<SVGSVGElement>(null);
   const needleRef = useRef<SVGGElement>(null);
-  const threadRef = useRef<SVGPathElement>(null);
-  const gradientRef = useRef<SVGLinearGradientElement>(null);
+  const threadWineRef = useRef<SVGPathElement>(null);
+  const threadGoldRef = useRef<SVGPathElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     const needle = needleRef.current;
-    const thread = threadRef.current;
-    const gradient = gradientRef.current;
-    if (!root || !needle || !thread || !gradient) return;
+    const threadWine = threadWineRef.current;
+    const threadGold = threadGoldRef.current;
+    if (!root || !needle || !threadWine || !threadGold) return;
+
+    const gradients = Array.from(root.querySelectorAll("linearGradient"));
 
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -365,12 +367,16 @@ export function NeedleCursor() {
         "transform",
         `translate(${mouseX.toFixed(2)} ${mouseY.toFixed(2)}) rotate(${tilt.toFixed(2)})`
       );
-      thread.setAttribute("d", catmullRomPath(points));
+      const path = catmullRomPath(points);
+      threadWine.setAttribute("d", path);
+      threadGold.setAttribute("d", path);
       const tail = points[points.length - 1];
-      gradient.setAttribute("x1", eyeX.toFixed(2));
-      gradient.setAttribute("y1", eyeY.toFixed(2));
-      gradient.setAttribute("x2", tail.x.toFixed(2));
-      gradient.setAttribute("y2", tail.y.toFixed(2));
+      for (const gradient of gradients) {
+        gradient.setAttribute("x1", eyeX.toFixed(2));
+        gradient.setAttribute("y1", eyeY.toFixed(2));
+        gradient.setAttribute("x2", tail.x.toFixed(2));
+        gradient.setAttribute("y2", tail.y.toFixed(2));
+      }
 
       raf = requestAnimationFrame(frame);
     };
@@ -406,26 +412,44 @@ export function NeedleCursor() {
     >
       <defs>
         <linearGradient
-          ref={gradientRef}
-          id="rn-needle-thread"
+          id="rn-thread-wine"
           gradientUnits="userSpaceOnUse"
           x1="0"
           y1="0"
           x2="0"
           y2="0"
         >
-          <stop className="rn-thread-stop" offset="0%" stopOpacity="0.95" />
-          <stop className="rn-thread-stop" offset="55%" stopOpacity="0.8" />
-          <stop className="rn-thread-stop" offset="100%" stopOpacity="0.25" />
+          <stop offset="0%" stopColor="#7a1f3d" stopOpacity="0.95" />
+          <stop offset="55%" stopColor="#7a1f3d" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#7a1f3d" stopOpacity="0.25" />
+        </linearGradient>
+        <linearGradient
+          id="rn-thread-gold"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="0"
+        >
+          <stop offset="0%" stopColor="#e8ce9c" stopOpacity="0.95" />
+          <stop offset="55%" stopColor="#e8ce9c" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#e8ce9c" stopOpacity="0.25" />
         </linearGradient>
       </defs>
 
-      {/* Thread trailing from the eye of the needle. */}
+      {/* Thread trailing from the eye, cross-fading between the two palettes. */}
       <path
-        ref={threadRef}
-        className="rn-thread"
+        ref={threadWineRef}
+        className="rn-thread-wine"
         fill="none"
-        stroke="url(#rn-needle-thread)"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        ref={threadGoldRef}
+        className="rn-thread-gold"
+        fill="none"
         strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"

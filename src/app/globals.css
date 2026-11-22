@@ -423,49 +423,48 @@
    needle takes over; the rules above stay as the fallback for every other
    case (touch, reduced motion, JavaScript disabled).
 
-   The needle re-colours itself per section: sage needle with a wine thread on
-   light surfaces, ivory-and-gold on dark ones (charcoal, wine, photos), so the
-   thread never disappears into the background.
+   The needle keeps its sage colour everywhere; only the thread changes with
+   the surface, because wine thread vanishes on charcoal and wine sections. The
+   two thread paths are cross-faded rather than re-coloured, which animates
+   smoothly even where a stroke/gradient transition would snap.
 --------------------------------------------------------------------------- */
-[data-rn-cursor] {
-  --rn-needle-edge: #5e8a66;
-  --rn-needle: #7ca982;
-  --rn-thread: #7a1f3d;
-}
-
-[data-rn-cursor][data-theme="dark"] {
-  --rn-needle-edge: #f8f5ef;
-  --rn-needle: #e8ce9c;
-  --rn-thread: #e8ce9c;
-}
-
 [data-rn-cursor] .rn-needle {
-  fill: var(--rn-needle);
-  transition: fill 220ms ease;
+  fill: #7ca982;
 }
 
 [data-rn-cursor] .rn-needle-edge {
-  fill: var(--rn-needle-edge);
-  transition: fill 220ms ease;
+  fill: #5e8a66;
 }
 
 [data-rn-cursor] .rn-eye {
-  stroke: var(--rn-needle);
-  transition: stroke 220ms ease;
+  stroke: #7ca982;
 }
 
 [data-rn-cursor] .rn-eye-edge {
-  stroke: var(--rn-needle-edge);
-  transition: stroke 220ms ease;
+  stroke: #5e8a66;
 }
 
-[data-rn-cursor] .rn-thread {
-  stroke: url(#rn-needle-thread);
+[data-rn-cursor] .rn-thread-wine {
+  stroke: url(#rn-thread-wine);
+  opacity: 1;
 }
 
-[data-rn-cursor] .rn-thread-stop {
-  stop-color: var(--rn-thread);
-  transition: stop-color 220ms ease;
+[data-rn-cursor] .rn-thread-gold {
+  stroke: url(#rn-thread-gold);
+  opacity: 0;
+}
+
+[data-rn-cursor] .rn-thread-wine,
+[data-rn-cursor] .rn-thread-gold {
+  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-rn-cursor][data-theme="dark"] .rn-thread-wine {
+  opacity: 0;
+}
+
+[data-rn-cursor][data-theme="dark"] .rn-thread-gold {
+  opacity: 1;
 }
 @media (hover: hover) and (pointer: fine) {
   html.rn-cursor-active,
