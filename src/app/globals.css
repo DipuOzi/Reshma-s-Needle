@@ -423,10 +423,9 @@
    needle takes over; the rules above stay as the fallback for every other
    case (touch, reduced motion, JavaScript disabled).
 
-   The needle keeps its sage colour everywhere; only the thread changes with
-   the surface, because wine thread vanishes on charcoal and wine sections. The
-   two thread paths are cross-faded rather than re-coloured, which animates
-   smoothly even where a stroke/gradient transition would snap.
+   The needle keeps its sage colour everywhere. The thread is coloured per
+   segment from the surface that piece of thread is over (JS sets the stroke),
+   so only the part of the thread inside a dark section turns champagne gold.
 --------------------------------------------------------------------------- */
 [data-rn-cursor] .rn-needle {
   fill: #7ca982;
@@ -444,27 +443,9 @@
   stroke: #5e8a66;
 }
 
-[data-rn-cursor] .rn-thread-wine {
-  stroke: url(#rn-thread-wine);
-  opacity: 1;
-}
-
-[data-rn-cursor] .rn-thread-gold {
-  stroke: url(#rn-thread-gold);
-  opacity: 0;
-}
-
-[data-rn-cursor] .rn-thread-wine,
-[data-rn-cursor] .rn-thread-gold {
-  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-[data-rn-cursor][data-theme="dark"] .rn-thread-wine {
-  opacity: 0;
-}
-
-[data-rn-cursor][data-theme="dark"] .rn-thread-gold {
-  opacity: 1;
+[data-rn-cursor] > path {
+  /* Colour comes from the component, per segment. */
+  transition: stroke 120ms linear;
 }
 @media (hover: hover) and (pointer: fine) {
   html.rn-cursor-active,

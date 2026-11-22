@@ -6,50 +6,53 @@ import { useEffect, useRef } from "react";
  * Animated tailor's needle cursor.
  *
  * The logo's needle (sage shaft, round eye) is drawn with its point exactly on
- * the pointer, and a wine thread runs out of the eye. The thread is a short
- * rope simulated with Verlet integration, so it trails behind the needle and
+ * the pointer, and a thread runs out of the eye. The thread is a short rope
+ * simulated with Verlet integration, so it trails behind the needle and
  * swings/settles on its own when the pointer moves.
  *
- * The needle stays sage everywhere, but the thread cross-fades to champagne
- * gold on dark surfaces (charcoal, wine, photos) so it never disappears into
- * the background. Any element can pin the choice with data-cursor-theme.
+ * The needle is always sage, but the thread is coloured segment by segment from
+ * the surface each piece of thread is actually over: wine over light areas,
+ * champagne gold over dark ones. Dropping into a dark section therefore paints
+ * only the part of the thread that is inside it. Any element can pin the choice
+ * with data-cursor-theme.
  *
  * Only active for fine pointers, and disabled for reduced-motion users — those
  * keep the plain needle cursor defined in globals.css.
  */
 
-const SEGMENTS = 12; // thread points after the eye
+const SEGMENTS = 12; // thread pieces after the eye
 const SEGMENT_LENGTH = 5.5; // px between points
 const DAMPING = 0.9;
 const GRAVITY = 1500; // px/s², keeps the thread hanging naturally
 const CONSTRAINT_PASSES = 3;
 const EYE_LOCAL = { x: 24.4, y: 24.4 }; // eye position in needle space
 const MAX_TILT = 12; // degrees the needle leans into the movement
-const DARK_LUMINANCE = 0.3; // below this the surface needs the dark colourway
+const DARK_LUMINANCE = 0.3; // below this the surface needs the light thread
 const OPAQUE_COVERAGE = 0.6; // less solid than this and the page shows through
-const THEME_CHECK_MS = 120;
+const THREAD_WINE = [122, 31, 61] as const;
+const THREAD_GOLD = [232, 206, 156] as const;
+const SAMPLE_INTERVAL_MS = 90; // how often surfaces under the thread are read
+const SAMPLE_SHIFT_PX = 8; // …or sooner if a point has moved this far
+const COLOUR_EASING = 0.2; // per frame, keeps the switch from snapping
 
 type Point = { x: number; y: number; px: number; py: number };
 type Theme = "light" | "dark";
 
-function catmullRomPath(points: Point[]): string {
-  if (points.length < 2) return "";
-  let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i - 1] ?? points[i];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[i + 2] ?? p2;
-    const c1x = p1.x + (p2.x - p0.x) / 6;
-    const c1y = p1.y + (p2.y - p0.y) / 6;
-    const c2x = p2.x - (p3.x - p1.x) / 6;
-    const c2y = p2.y - (p3.y - p1.y) / 6;
-    d +=
-      ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}` +
-      ` ${c2x.toFixed(2)} ${c2y.toFixed(2)}` +
-      ` ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
-  }
-  return d;
+function catmullRomSegment(points: Point[], index: number): string {
+  const p0 = points[index - 1] ?? points[index];
+  const p1 = points[index];
+  const p2 = points[index + 1];
+  const p3 = points[index + 2] ?? p2;
+  const c1x = p1.x + (p2.x - p0.x) / 6;
+  const c1y = p1.y + (p2.y - p0.y) / 6;
+  const c2x = p2.x - (p3.x - p1.x) / 6;
+  const c2y = p2.y - (p3.y - p1.y) / 6;
+  return (
+    `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}` +
+    ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}` +
+    ` ${c2x.toFixed(2)} ${c2y.toFixed(2)}` +
+    ` ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`
+  );
 }
 
 function channelLuminance(channel: number): number {
@@ -63,6 +66,15 @@ function relativeLuminance(r: number, g: number, b: number): number {
     0.7152 * channelLuminance(g) +
     0.0722 * channelLuminance(b)
   );
+}
+
+function mixThreadColor(factor: number): string {
+  const t = factor < 0 ? 0 : factor > 1 ? 1 : factor;
+  const channel = (from: number, to: number) => Math.round(from + (to - from) * t);
+  return `rgb(${channel(THREAD_WINE[0], THREAD_GOLD[0])}, ${channel(
+    THREAD_WINE[1],
+    THREAD_GOLD[1]
+  )}, ${channel(THREAD_WINE[2], THREAD_GOLD[2])})`;
 }
 
 /** Parses a computed colour, returning null for fully transparent values. */
@@ -79,10 +91,10 @@ function parseColor(value: string): [number, number, number, number] | null {
   return [parts[0], parts[1], parts[2], alpha];
 }
 
+type ImageSample = { luminance: number; coverage: number };
+
 const imageLuminanceCache = new Map<string, ImageSample | null>();
 const imageLuminancePending = new Set<string>();
-
-type ImageSample = { luminance: number; coverage: number };
 
 /**
  * Average luminance of an image, sampled once and cached by source. `coverage`
@@ -145,17 +157,13 @@ function sampleImage(
 export function NeedleCursor() {
   const rootRef = useRef<SVGSVGElement>(null);
   const needleRef = useRef<SVGGElement>(null);
-  const threadWineRef = useRef<SVGPathElement>(null);
-  const threadGoldRef = useRef<SVGPathElement>(null);
+  const segmentRefs = useRef<(SVGPathElement | null)[]>([]);
 
   useEffect(() => {
     const root = rootRef.current;
     const needle = needleRef.current;
-    const threadWine = threadWineRef.current;
-    const threadGold = threadGoldRef.current;
-    if (!root || !needle || !threadWine || !threadGold) return;
-
-    const gradients = Array.from(root.querySelectorAll("linearGradient"));
+    const segments = segmentRefs.current;
+    if (!root || !needle || segments.some((segment) => !segment)) return;
 
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -174,9 +182,6 @@ export function NeedleCursor() {
     let overText = false;
     let raf = 0;
     let lastTime = performance.now();
-    let theme: Theme = "light";
-    let checkedTarget: Element | null = null;
-    let checkedAt = 0;
 
     const points: Point[] = Array.from({ length: SEGMENTS + 1 }, () => ({
       x: mouseX,
@@ -185,11 +190,13 @@ export function NeedleCursor() {
       py: mouseY,
     }));
 
-    const setTheme = (next: Theme) => {
-      if (next === theme) return;
-      theme = next;
-      root.dataset.theme = next;
-    };
+    // Surface colour under each thread point, eased per segment as it moves.
+    const surface: Theme[] = Array.from({ length: SEGMENTS + 1 }, () => "light");
+    const sampledAt = new Float64Array(SEGMENTS + 1);
+    const sampledX = new Float64Array(SEGMENTS + 1).fill(Number.NaN);
+    const sampledY = new Float64Array(SEGMENTS + 1).fill(Number.NaN);
+    const segmentFactor = new Float32Array(SEGMENTS).fill(0);
+    const themeCache = new WeakMap<Element, Theme>();
 
     const setOpacity = (visible: boolean) => {
       root.style.opacity = visible ? "1" : "0";
@@ -217,58 +224,58 @@ export function NeedleCursor() {
       return true;
     };
 
-    /** First explicit cue or opaque background at or above an element. */
-    const themeFromSurface = (start: Element | null): Theme | null => {
-      let element = start;
-      while (element && element !== html) {
-        const override = element.getAttribute("data-cursor-theme");
-        if (override === "dark" || override === "light") return override;
-        if (element instanceof HTMLElement) {
-          const color = parseColor(getComputedStyle(element).backgroundColor);
-          if (color) {
-            const luminance = relativeLuminance(color[0], color[1], color[2]);
-            return luminance < DARK_LUMINANCE ? "dark" : "light";
-          }
-        }
-        element = element.parentElement;
-      }
-      return null;
-    };
+    /** Colourway of the surface at a viewport position. */
+    const surfaceAt = (x: number, y: number): Theme => {
+      const start = document.elementFromPoint(x, y);
+      if (!start) return "light";
+      const cached = themeCache.get(start);
+      if (cached) return cached;
 
-    /** Resolves the colourway for whatever sits under the pointer. */
-    const resolveTheme = (target: EventTarget | null) => {
-      let element: Element | null = target instanceof Element ? target : null;
+      let element: Element | null = start;
+      let result: Theme = "light";
       while (element && element !== html) {
         const override = element.getAttribute("data-cursor-theme");
         if (override === "dark" || override === "light") {
-          setTheme(override);
-          return;
+          result = override;
+          break;
         }
         if (element instanceof HTMLImageElement) {
-          // Photos carry no background colour — measure the pixels instead.
-          const source = element;
-          sampleImage(element, (value, coverage) => {
-            if (checkedTarget !== source) return;
-            if (value === null || coverage < OPAQUE_COVERAGE) {
-              // Cut-outs and logos: the page behind them is the real surface.
-              setTheme(themeFromSurface(source.parentElement) ?? "light");
-              return;
-            }
-            setTheme(value < DARK_LUMINANCE ? "dark" : "light");
-          });
-          return;
+          const src = element.currentSrc || element.src;
+          const sample = src ? imageLuminanceCache.get(src) : null;
+          if (sample && sample.coverage >= OPAQUE_COVERAGE) {
+            result = sample.luminance < DARK_LUMINANCE ? "dark" : "light";
+            break;
+          }
+          // Unknown photo: measure it in the background and use it next time.
+          sampleImage(element, () => {});
+          element = element.parentElement;
+          continue;
         }
         if (element instanceof HTMLElement) {
           const color = parseColor(getComputedStyle(element).backgroundColor);
           if (color) {
             const luminance = relativeLuminance(color[0], color[1], color[2]);
-            setTheme(luminance < DARK_LUMINANCE ? "dark" : "light");
-            return;
+            result = luminance < DARK_LUMINANCE ? "dark" : "light";
+            break;
           }
         }
         element = element.parentElement;
       }
-      setTheme("light");
+
+      themeCache.set(start, result);
+      return result;
+    };
+
+    const sampleSurface = (now: number) => {
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const moved = Math.hypot(p.x - sampledX[i], p.y - sampledY[i]);
+        if (now - sampledAt[i] < SAMPLE_INTERVAL_MS && moved < SAMPLE_SHIFT_PX) continue;
+        sampledAt[i] = now;
+        sampledX[i] = p.x;
+        sampledY[i] = p.y;
+        surface[i] = surfaceAt(p.x, p.y);
+      }
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -282,14 +289,7 @@ export function NeedleCursor() {
           p.px = mouseX;
           p.py = mouseY;
         });
-      }
-
-      const target = event.target instanceof Element ? event.target : null;
-      const now = performance.now();
-      if (target !== checkedTarget || now - checkedAt > THEME_CHECK_MS) {
-        checkedTarget = target;
-        checkedAt = now;
-        resolveTheme(event.target);
+        sampledX.fill(Number.NaN);
       }
 
       const text = isTextTarget(event.target);
@@ -363,19 +363,31 @@ export function NeedleCursor() {
         }
       }
 
+      sampleSurface(now);
+
       needle.setAttribute(
         "transform",
         `translate(${mouseX.toFixed(2)} ${mouseY.toFixed(2)}) rotate(${tilt.toFixed(2)})`
       );
-      const path = catmullRomPath(points);
-      threadWine.setAttribute("d", path);
-      threadGold.setAttribute("d", path);
-      const tail = points[points.length - 1];
-      for (const gradient of gradients) {
-        gradient.setAttribute("x1", eyeX.toFixed(2));
-        gradient.setAttribute("y1", eyeY.toFixed(2));
-        gradient.setAttribute("x2", tail.x.toFixed(2));
-        gradient.setAttribute("y2", tail.y.toFixed(2));
+
+      for (let i = 0; i < SEGMENTS; i++) {
+        const path = catmullRomSegment(points, i);
+        const segment = segments[i];
+        if (!segment) continue;
+
+        // Each piece of thread takes the average of the surface at its ends,
+        // eased so a crossing fades instead of switching on a pixel boundary.
+        const target =
+          (surface[i] === "dark" ? 0.5 : 0) + (surface[i + 1] === "dark" ? 0.5 : 0);
+        segmentFactor[i] += (target - segmentFactor[i]) * COLOUR_EASING;
+        const factor = segmentFactor[i];
+
+        segment.setAttribute("d", path);
+        segment.setAttribute("stroke", mixThreadColor(factor));
+        segment.setAttribute(
+          "stroke-opacity",
+          (0.95 - (i / (SEGMENTS - 1)) * 0.7).toFixed(2)
+        );
       }
 
       raf = requestAnimationFrame(frame);
@@ -407,57 +419,25 @@ export function NeedleCursor() {
       ref={rootRef}
       aria-hidden="true"
       data-rn-cursor=""
-      data-theme="light"
       className="pointer-events-none fixed inset-0 z-[200] h-full w-full opacity-0 transition-opacity duration-150"
     >
-      <defs>
-        <linearGradient
-          id="rn-thread-wine"
-          gradientUnits="userSpaceOnUse"
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="0"
-        >
-          <stop offset="0%" stopColor="#7a1f3d" stopOpacity="0.95" />
-          <stop offset="55%" stopColor="#7a1f3d" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#7a1f3d" stopOpacity="0.25" />
-        </linearGradient>
-        <linearGradient
-          id="rn-thread-gold"
-          gradientUnits="userSpaceOnUse"
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="0"
-        >
-          <stop offset="0%" stopColor="#e8ce9c" stopOpacity="0.95" />
-          <stop offset="55%" stopColor="#e8ce9c" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#e8ce9c" stopOpacity="0.25" />
-        </linearGradient>
-      </defs>
+      {/* Thread: one short curve per segment so each piece can carry the colour
+          of the surface it is lying on. */}
+      {Array.from({ length: SEGMENTS }, (_, index) => (
+        <path
+          key={index}
+          ref={(element) => {
+            segmentRefs.current[index] = element;
+          }}
+          fill="none"
+          stroke="rgb(122, 31, 61)"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ))}
 
-      {/* Thread trailing from the eye, cross-fading between the two palettes. */}
-      <path
-        ref={threadWineRef}
-        className="rn-thread-wine"
-        fill="none"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        ref={threadGoldRef}
-        className="rn-thread-gold"
-        fill="none"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      {/* Needle: a tapered shaft that comes to a real point at the local origin
-          (the hotspot) and runs down-right, like a normal mouse pointer, with
-          the round eye at its head. */}
+      {/* Needle: point at the local origin, eye down and to the right. */}
       <g ref={needleRef}>
         <path className="rn-needle-edge" d="M0 0 L19.30 21.70 L21.70 19.30 Z" />
         <circle className="rn-needle-edge" cx="20.5" cy="20.5" r="1.7" />
