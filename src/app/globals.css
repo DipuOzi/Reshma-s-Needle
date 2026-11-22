@@ -377,3 +377,40 @@
     cursor: not-allowed;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Tailor's needle cursor (desktop pointers only).
+
+   The PNG is the primary cursor because Firefox does not render SVG cursors;
+   the SVG is kept as a fallback. The hotspot (4, 32) is the sharp needle tip.
+   Touch devices keep their native behaviour, and text fields keep the I-beam
+   so typing is unaffected.
+--------------------------------------------------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  html {
+    cursor: url("/needle-cursor.png") 4 32, url("/needle-cursor.svg") 4 32, auto;
+  }
+
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select:not(:disabled),
+  label[for],
+  label:has(> input[type="checkbox"]),
+  label:has(> input[type="radio"]),
+  label:has(> input[type="file"]),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="button"]:not(:disabled),
+  .cursor-pointer {
+    cursor: url("/needle-cursor-hover.png") 4 32, url("/needle-cursor-hover.svg") 4 32, pointer;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="button"]):not(:disabled),
+  textarea:not(:disabled) {
+    cursor: text;
+  }
+}
