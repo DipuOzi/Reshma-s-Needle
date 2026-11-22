@@ -10,6 +10,10 @@ import { useEffect, useRef } from "react";
  * rope simulated with Verlet integration, so it trails behind the needle and
  * swings/settles on its own when the pointer moves.
  *
+ * The needle and thread also re-colour themselves for the surface underneath:
+ * on dark sections (charcoal, wine, photos) the thread turns champagne gold so
+ * it stays visible. Any element can pin the choice with data-cursor-theme.
+ *
  * Only active for fine pointers, and disabled for reduced-motion users — those
  * keep the plain needle cursor defined in globals.css.
  */
@@ -19,10 +23,14 @@ const SEGMENT_LENGTH = 5.5; // px between points
 const DAMPING = 0.9;
 const GRAVITY = 1500; // px/s², keeps the thread hanging naturally
 const CONSTRAINT_PASSES = 3;
-const EYE_LOCAL = { x: 24.4, y: -24.4 }; // eye position in needle space
+const EYE_LOCAL = { x: 24.4, y: 24.4 }; // eye position in needle space
 const MAX_TILT = 12; // degrees the needle leans into the movement
+const DARK_LUMINANCE = 0.3; // below this the surface needs the dark colourway
+const OPAQUE_COVERAGE = 0.6; // less solid than this and the page shows through
+const THEME_CHECK_MS = 120;
 
 type Point = { x: number; y: number; px: number; py: number };
+type Theme = "light" | "dark";
 
 function catmullRomPath(points: Point[]): string {
   if (points.length < 2) return "";
@@ -42,6 +50,96 @@ function catmullRomPath(points: Point[]): string {
       ` ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
   }
   return d;
+}
+
+function channelLuminance(channel: number): number {
+  const value = channel / 255;
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(r: number, g: number, b: number): number {
+  return (
+    0.2126 * channelLuminance(r) +
+    0.7152 * channelLuminance(g) +
+    0.0722 * channelLuminance(b)
+  );
+}
+
+/** Parses a computed colour, returning null for fully transparent values. */
+function parseColor(value: string): [number, number, number, number] | null {
+  const match = value.match(/rgba?\(([^)]+)\)/);
+  if (!match) return null;
+  const parts = match[1]
+    .split(/[,\s/]+/)
+    .filter(Boolean)
+    .map(Number);
+  if (parts.length < 3 || parts.slice(0, 3).some(Number.isNaN)) return null;
+  const alpha = parts.length > 3 ? parts[3] : 1;
+  if (Number.isNaN(alpha) || alpha < 0.5) return null;
+  return [parts[0], parts[1], parts[2], alpha];
+}
+
+const imageLuminanceCache = new Map<string, ImageSample | null>();
+const imageLuminancePending = new Set<string>();
+
+type ImageSample = { luminance: number; coverage: number };
+
+/**
+ * Average luminance of an image, sampled once and cached by source. `coverage`
+ * is the share of non-transparent pixels: logos and cut-outs show the page
+ * behind them, so their own pixels are not the surface the pointer is over.
+ */
+function sampleImage(
+  element: HTMLImageElement,
+  done: (value: number | null, coverage: number) => void
+) {
+  const src = element.currentSrc || element.src;
+  if (!src) return done(null, 0);
+  if (imageLuminanceCache.has(src)) {
+    const cached = imageLuminanceCache.get(src) ?? null;
+    return done(cached?.luminance ?? null, cached?.coverage ?? 0);
+  }
+  if (imageLuminancePending.has(src)) return;
+
+  imageLuminancePending.add(src);
+  const image = new Image();
+  if (!src.startsWith("data:")) image.crossOrigin = "anonymous";
+  image.onload = () => {
+    try {
+      const size = 16;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (!context) throw new Error("no 2d context");
+      context.drawImage(image, 0, 0, size, size);
+      const { data } = context.getImageData(0, 0, size, size);
+      let total = 0;
+      let count = 0;
+      let pixels = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        pixels++;
+        if (data[i + 3] < 40) continue;
+        total += relativeLuminance(data[i], data[i + 1], data[i + 2]);
+        count++;
+      }
+      const result: ImageSample | null =
+        count > 0 ? { luminance: total / count, coverage: count / pixels } : null;
+      imageLuminanceCache.set(src, result);
+      done(result?.luminance ?? null, result?.coverage ?? 0);
+    } catch {
+      imageLuminanceCache.set(src, null);
+      done(null, 0);
+    } finally {
+      imageLuminancePending.delete(src);
+    }
+  };
+  image.onerror = () => {
+    imageLuminanceCache.set(src, null);
+    imageLuminancePending.delete(src);
+    done(null, 0);
+  };
+  image.src = src;
 }
 
 export function NeedleCursor() {
@@ -74,6 +172,9 @@ export function NeedleCursor() {
     let overText = false;
     let raf = 0;
     let lastTime = performance.now();
+    let theme: Theme = "light";
+    let checkedTarget: Element | null = null;
+    let checkedAt = 0;
 
     const points: Point[] = Array.from({ length: SEGMENTS + 1 }, () => ({
       x: mouseX,
@@ -82,6 +183,12 @@ export function NeedleCursor() {
       py: mouseY,
     }));
 
+    const setTheme = (next: Theme) => {
+      if (next === theme) return;
+      theme = next;
+      root.dataset.theme = next;
+    };
+
     const setOpacity = (visible: boolean) => {
       root.style.opacity = visible ? "1" : "0";
     };
@@ -89,13 +196,77 @@ export function NeedleCursor() {
     const isTextTarget = (target: EventTarget | null): boolean => {
       if (!(target instanceof Element)) return false;
       if (target.closest("button, a, [role='button'], select")) return false;
-      const field = target.closest("input, textarea, [contenteditable=''], [contenteditable='true']");
+      const field = target.closest(
+        "input, textarea, [contenteditable=''], [contenteditable='true']"
+      );
       if (!(field instanceof HTMLElement)) return false;
       if (field instanceof HTMLInputElement) {
         const type = field.type;
-        return !["checkbox", "radio", "file", "submit", "button", "color", "range"].includes(type);
+        return ![
+          "checkbox",
+          "radio",
+          "file",
+          "submit",
+          "button",
+          "color",
+          "range",
+        ].includes(type);
       }
       return true;
+    };
+
+    /** First explicit cue or opaque background at or above an element. */
+    const themeFromSurface = (start: Element | null): Theme | null => {
+      let element = start;
+      while (element && element !== html) {
+        const override = element.getAttribute("data-cursor-theme");
+        if (override === "dark" || override === "light") return override;
+        if (element instanceof HTMLElement) {
+          const color = parseColor(getComputedStyle(element).backgroundColor);
+          if (color) {
+            const luminance = relativeLuminance(color[0], color[1], color[2]);
+            return luminance < DARK_LUMINANCE ? "dark" : "light";
+          }
+        }
+        element = element.parentElement;
+      }
+      return null;
+    };
+
+    /** Resolves the colourway for whatever sits under the pointer. */
+    const resolveTheme = (target: EventTarget | null) => {
+      let element: Element | null = target instanceof Element ? target : null;
+      while (element && element !== html) {
+        const override = element.getAttribute("data-cursor-theme");
+        if (override === "dark" || override === "light") {
+          setTheme(override);
+          return;
+        }
+        if (element instanceof HTMLImageElement) {
+          // Photos carry no background colour — measure the pixels instead.
+          const source = element;
+          sampleImage(element, (value, coverage) => {
+            if (checkedTarget !== source) return;
+            if (value === null || coverage < OPAQUE_COVERAGE) {
+              // Cut-outs and logos: the page behind them is the real surface.
+              setTheme(themeFromSurface(source.parentElement) ?? "light");
+              return;
+            }
+            setTheme(value < DARK_LUMINANCE ? "dark" : "light");
+          });
+          return;
+        }
+        if (element instanceof HTMLElement) {
+          const color = parseColor(getComputedStyle(element).backgroundColor);
+          if (color) {
+            const luminance = relativeLuminance(color[0], color[1], color[2]);
+            setTheme(luminance < DARK_LUMINANCE ? "dark" : "light");
+            return;
+          }
+        }
+        element = element.parentElement;
+      }
+      setTheme("light");
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -110,6 +281,15 @@ export function NeedleCursor() {
           p.py = mouseY;
         });
       }
+
+      const target = event.target instanceof Element ? event.target : null;
+      const now = performance.now();
+      if (target !== checkedTarget || now - checkedAt > THEME_CHECK_MS) {
+        checkedTarget = target;
+        checkedAt = now;
+        resolveTheme(event.target);
+      }
+
       const text = isTextTarget(event.target);
       if (text !== overText) {
         overText = text;
@@ -200,9 +380,10 @@ export function NeedleCursor() {
     window.addEventListener("pointerdown", onPointerMove, { passive: true });
     document.addEventListener("mouseleave", hide);
     window.addEventListener("blur", hide);
-    document.addEventListener("visibilitychange", () => {
+    const onVisibilityChange = () => {
       if (document.hidden) hide();
-    });
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -210,6 +391,7 @@ export function NeedleCursor() {
       window.removeEventListener("pointerdown", onPointerMove);
       document.removeEventListener("mouseleave", hide);
       window.removeEventListener("blur", hide);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       html.classList.remove("rn-cursor-active");
     };
   }, []);
@@ -219,6 +401,7 @@ export function NeedleCursor() {
       ref={rootRef}
       aria-hidden="true"
       data-rn-cursor=""
+      data-theme="light"
       className="pointer-events-none fixed inset-0 z-[200] h-full w-full opacity-0 transition-opacity duration-150"
     >
       <defs>
@@ -231,15 +414,16 @@ export function NeedleCursor() {
           x2="0"
           y2="0"
         >
-          <stop offset="0%" stopColor="#7A1F3D" stopOpacity="0.95" />
-          <stop offset="55%" stopColor="#7A1F3D" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#7A1F3D" stopOpacity="0.25" />
+          <stop className="rn-thread-stop" offset="0%" stopOpacity="0.95" />
+          <stop className="rn-thread-stop" offset="55%" stopOpacity="0.8" />
+          <stop className="rn-thread-stop" offset="100%" stopOpacity="0.25" />
         </linearGradient>
       </defs>
 
       {/* Thread trailing from the eye of the needle. */}
       <path
         ref={threadRef}
+        className="rn-thread"
         fill="none"
         stroke="url(#rn-needle-thread)"
         strokeWidth="1.6"
@@ -247,12 +431,30 @@ export function NeedleCursor() {
         strokeLinejoin="round"
       />
 
-      {/* Needle: point at the local origin, eye up and to the right. */}
+      {/* Needle: a tapered shaft that comes to a real point at the local origin
+          (the hotspot) and runs down-right, like a normal mouse pointer, with
+          the round eye at its head. */}
       <g ref={needleRef}>
-        <path d="M0 0 20.5 -20.5" stroke="#5E8A66" strokeWidth="3.4" strokeLinecap="round" fill="none" />
-        <path d="M0 0 20.5 -20.5" stroke="#7CA982" strokeWidth="2.1" strokeLinecap="round" fill="none" />
-        <circle cx="23.2" cy="-23.2" r="2.9" stroke="#5E8A66" strokeWidth="2.6" fill="none" />
-        <circle cx="23.2" cy="-23.2" r="2.9" stroke="#7CA982" strokeWidth="1.3" fill="none" />
+        <path className="rn-needle-edge" d="M0 0 L19.30 21.70 L21.70 19.30 Z" />
+        <circle className="rn-needle-edge" cx="20.5" cy="20.5" r="1.7" />
+        <path className="rn-needle" d="M0 0 L19.76 21.24 L21.24 19.76 Z" />
+        <circle className="rn-needle" cx="20.5" cy="20.5" r="1.05" />
+        <circle
+          className="rn-eye-edge"
+          cx="23.2"
+          cy="23.2"
+          r="2.9"
+          strokeWidth="2.6"
+          fill="none"
+        />
+        <circle
+          className="rn-eye"
+          cx="23.2"
+          cy="23.2"
+          r="2.9"
+          strokeWidth="1.3"
+          fill="none"
+        />
       </g>
     </svg>
   );

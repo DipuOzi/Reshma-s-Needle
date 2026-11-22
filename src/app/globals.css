@@ -422,7 +422,51 @@
    motion allowed. While it is on, the native cursor is hidden and the SVG
    needle takes over; the rules above stay as the fallback for every other
    case (touch, reduced motion, JavaScript disabled).
+
+   The needle re-colours itself per section: sage needle with a wine thread on
+   light surfaces, ivory-and-gold on dark ones (charcoal, wine, photos), so the
+   thread never disappears into the background.
 --------------------------------------------------------------------------- */
+[data-rn-cursor] {
+  --rn-needle-edge: #5e8a66;
+  --rn-needle: #7ca982;
+  --rn-thread: #7a1f3d;
+}
+
+[data-rn-cursor][data-theme="dark"] {
+  --rn-needle-edge: #f8f5ef;
+  --rn-needle: #e8ce9c;
+  --rn-thread: #e8ce9c;
+}
+
+[data-rn-cursor] .rn-needle {
+  fill: var(--rn-needle);
+  transition: fill 220ms ease;
+}
+
+[data-rn-cursor] .rn-needle-edge {
+  fill: var(--rn-needle-edge);
+  transition: fill 220ms ease;
+}
+
+[data-rn-cursor] .rn-eye {
+  stroke: var(--rn-needle);
+  transition: stroke 220ms ease;
+}
+
+[data-rn-cursor] .rn-eye-edge {
+  stroke: var(--rn-needle-edge);
+  transition: stroke 220ms ease;
+}
+
+[data-rn-cursor] .rn-thread {
+  stroke: url(#rn-needle-thread);
+}
+
+[data-rn-cursor] .rn-thread-stop {
+  stop-color: var(--rn-thread);
+  transition: stop-color 220ms ease;
+}
 @media (hover: hover) and (pointer: fine) {
   html.rn-cursor-active,
   html.rn-cursor-active * {
