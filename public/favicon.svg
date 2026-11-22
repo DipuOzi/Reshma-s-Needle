@@ -1,12 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <title>Reshma's Needle Favicon</title>
-  <!-- Brand cream background, matching the site and the logo -->
-  <rect width="64" height="64" rx="14" fill="#F8F5EF"/>
-  <!-- RN initials — drawn as SVG paths so they render reliably in favicons -->
-  <path d="M18 16 L18 32 M18 16 Q26 16 26 24 Q26 32 18 32 M18 32 Q24 32 28 46" stroke="#292725" stroke-width="4" stroke-linecap="round" fill="none"/>
-  <path d="M36 16 L36 46 M36 46 L48 16 M48 16 L48 46" stroke="#292725" stroke-width="4" stroke-linecap="round" fill="none"/>
-  <!-- Needle mark from the logo — sage shaft #7CA982 -->
-  <path d="M46 14 58 6" stroke="#7CA982" stroke-width="4" stroke-linecap="round" fill="none"/>
-  <!-- Thread mark from the logo — wine thread #7A1F3D -->
-  <path d="M45 10 C53 8 57 16 50 20 C46 22 42 15 45 11" stroke="#7A1F3D" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+  <!-- Brand cream background -->
+  <rect width="64" height="64" rx="12" fill="#F8F5EF"/>
+  <!-- Professional RN monogram — drawn as SVG paths for reliable rendering -->
+  <!-- R -->
+  <path d="M20 12 V36 M20 12 L26 32 M26 32 V36 M26 36 L20 36" stroke="#292725" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- N -->
+  <path d="M38 12 V36 M38 12 L50 36 M50 36 V12" stroke="#292725" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Needle accent from logo — sage #7CA982 -->
+  <path d="M46 14 57 6" stroke="#7CA982" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Thread accent from logo — wine #7A1F3D -->
+  <path d="M44 10 C50 8 54 14 48 19 C45 22 42 16 44 11" stroke="#7A1F3D" stroke-width="2" stroke-linecap="round" fill="none"/>
 </svg>
