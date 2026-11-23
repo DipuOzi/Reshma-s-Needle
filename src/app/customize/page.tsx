@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Check,
@@ -35,6 +36,11 @@ const STEPS = [
 ];
 
 function CustomizeWizardContent() {
+  const searchParams = useSearchParams();
+  const preselectedProductId = searchParams.get("productId");
+  const preselectedCategoryParam = searchParams.get("category");
+  const preselectedColorParam = searchParams.get("color");
+
   const { settings, customer, showToast, content } = useStore();
   const studio = content.customize;
   const OUTFIT_TYPES: Array<{
@@ -117,7 +123,9 @@ function CustomizeWizardContent() {
     }
   }, [customer]);
 
-  // Load products only — no product is pre-selected, the user picks in Step 2
+  // Load products and carry over the chosen product when the user arrived
+  // from a "Bespoke" action (e.g. /customize?productId=...).
+  // A plain visit to /customize starts with nothing selected.
   useEffect(() => {
     async function initProducts() {
       setLoadingProducts(true);
@@ -127,6 +135,37 @@ function CustomizeWizardContent() {
           const data = await res.json();
           const all: ProductRecord[] = data.products || [];
           setProducts(all);
+
+          if (preselectedProductId) {
+            const match = all.find(
+              (p) =>
+                String(p.id) === preselectedProductId ||
+                p.slug === preselectedProductId
+            );
+            if (match) {
+              setSelectedCategory(match.category);
+              setSelectedProduct(match);
+              setSelectedColor(
+                preselectedColorParam || match.colors[0] || "Deep Wine"
+              );
+              // Outfit + design are already chosen — go straight to measurements
+              setStep(3);
+              return;
+            }
+          }
+
+          if (
+            preselectedCategoryParam === "Three Piece" ||
+            preselectedCategoryParam === "Two Piece" ||
+            preselectedCategoryParam === "Tops"
+          ) {
+            // Only the silhouette is known — design must still be picked in Step 2
+            setSelectedCategory(preselectedCategoryParam);
+            setStep(2);
+            return;
+          }
+
+          // No params: leave everything unselected, user starts at Step 1
         }
       } catch {
         // ignore
@@ -135,7 +174,7 @@ function CustomizeWizardContent() {
       }
     }
     initProducts();
-  }, []);
+  }, [preselectedProductId, preselectedCategoryParam, preselectedColorParam]);
 
   const categoryProducts = products.filter(
     (p) => p.category === selectedCategory
@@ -1458,5 +1497,17 @@ function CustomizeWizardContent() {
 }
 
 export default function CustomizePage() {
-  return <CustomizeWizardContent />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-ivory-rich flex items-center justify-center">
+          <p className="font-serif text-2xl text-[#6E6A64]">
+            Preparing bespoke tailoring studio...
+          </p>
+        </div>
+      }
+    >
+      <CustomizeWizardContent />
+    </Suspense>
+  );
 }
